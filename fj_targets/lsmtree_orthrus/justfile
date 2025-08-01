@@ -1,0 +1,172 @@
+common_flags := "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON -G Ninja"
+common_flags_debug := common_flags + " -DCMAKE_BUILD_TYPE=Debug"
+common_flags_release := common_flags + " -DCMAKE_BUILD_TYPE=Release"
+
+CMAKE := "cmake"
+
+config:
+  {{CMAKE}} -B build -S . {{common_flags_debug}}
+
+config-rel:
+  {{CMAKE}} -B build -S . {{common_flags_release}}
+
+config-lsmtree:
+  {{CMAKE}} -B build -S . {{common_flags_debug}}   -DENABLE_LSMTREE=ON
+
+config-lsmtree-rel:
+  {{CMAKE}} -B build -S . {{common_flags_release}} -DENABLE_LSMTREE=ON
+
+
+build:
+  {{CMAKE}} --build build -j
+
+
+stats: build
+  taskset -c 1,2,3 ./build/tests/lsmtree/throughput/lsmtree_throughput_stats
+
+test-throughput throughput="50000000": build  # 8 client + 1 server + 1 replica
+  #!/bin/bash
+  trap "echo 'Killing all background jobs...'; jobs -p | xargs kill; exit" SIGINT
+
+  function worker() {
+    NAME=$1
+    echo $NAME
+    taskset -c 1-4 ./build/tests/lsmtree/throughput/lsmtree_socket_throughput_$NAME &
+    sleep 1
+    ./build/tests/lsmtree/throughput/lsmtree_socket_throughput_client --total-ops={{throughput}} &
+    wait
+    sleep 1
+  }
+
+  worker raw
+  worker scee
+  worker rbv
+
+test-memory throughput="50000000":
+  #!/usr/bin/env bash
+  trap "echo 'Killing all background jobs...'; jobs -p | xargs kill; exit" SIGINT
+  function worker() {
+    NAME=$1; echo =============== $NAME =============
+    taskset -c 1-4 ./build/tests/lsmtree/throughput/lsmtree_socket_profile_mem_$NAME &
+    sleep 1
+    ./build/tests/lsmtree/throughput/lsmtree_socket_throughput_client --total-ops={{throughput}} &
+    wait; sleep 1
+  }
+
+  worker raw
+  worker scee
+  worker rbv
+
+  python3 scripts/memory.py  \
+    --input-raw memory_status_raw.log \
+    --input-rbv memory_status_rbv.log \
+    --input-scee memory_status_scee.log
+
+test-latency-cdf throughput="50000000": build
+  #!/usr/bin/env bash
+  trap "echo 'Killing all background jobs...'; jobs -p | xargs kill; exit" SIGINT
+  function worker() {
+    NAME=$1; echo =============== $NAME =============
+    taskset -c 1-4 ./build/tests/lsmtree/throughput/lsmtree_socket_val_latency_cdf_$NAME &
+    sleep 1
+    ./build/tests/lsmtree/throughput/lsmtree_socket_throughput_client --total-ops={{throughput}} &
+    wait && sleep 1
+  }
+
+  worker scee
+  worker rbv
+
+  python scripts/validation-latency.py
+
+# test-latency-rbv throughput="50000000": build
+#   echo =============== rbv =============
+#   ./build/tests/lsmtree/latency/lsmtree_socket_latency_pXX_rbv --total_ops {{throughput}}
+
+test-latency-all: build
+  #!/usr/bin/env bash
+  trap "echo 'Killing all background jobs...'; jobs -p | xargs kill; exit" SIGINT
+  function worker() {
+    NAME=$1
+    LOG=latency_vs_pXX_${NAME}.log
+    echo > $LOG
+    for i in  `seq 10 7000 300000`; do
+      echo -e "\n====>  $NAME @ $i  <===="
+      echo $i >> log
+      taskset -c 1-5 ./build/tests/lsmtree/latency/lsmtree_socket_latency_pXX_$NAME &
+      sleep 1
+      tasket -c 10-30./build/tests/lsmtree/latency/lsmtree_socket_latency_pXX_client \
+        --throughput $i 2>&1 | tee /tmp/$LOG &
+      wait; sleep 1
+      cat /tmp/$LOG >> $LOG
+      echo -e "\n\n">> $LOG
+    done
+  }
+  # worker raw
+  # worker scee
+  worker rbv
+  just analyze-latency
+
+analyze-latency:
+  python scripts/latency_vs_pXX_parser.py -i latency_vs_pXX_raw.log -o latency_vs_pXX_raw.json
+  python scripts/latency_vs_pXX_parser.py -i latency_vs_pXX_scee.log -o latency_vs_pXX_scee.json
+  python scripts/latency_vs_pXX_parser.py -i latency_vs_pXX_rbv.log -o latency_vs_pXX_rbv.json
+  python scripts/tail-latency.py
+
+# test-cdf:
+#   ./build/tests/lsmtree/throughput/lsmtree_throughput_raw
+#   ./build/tests/lsmtree/throughput/lsmtree_throughput_rbv
+
+lsmtree-test: build
+  rm -rf /dev/shm/lsmtree
+  gdb --args ./build/tests/lsmtree/lsmtree_concepts
+
+lsmtree-bench cnt="10000000": config-lsmtree build
+  just lsmtree-bench-part {{cnt}}
+
+lsmtree-bench-rel cnt="10000000": config-lsmtree-rel build
+  just lsmtree-bench-part {{cnt}}
+
+lsmtree-bench-part cnt:
+  rm -rf /dev/shm/lsmtree*
+  rm -rf /dev/shm/rocksdb*
+  # echo "" && sleep 2 && echo lsmtree_test
+  # ./build/tests/lsmtree/throughput/lsmtree_throughput_test --total_ops={{cnt}}
+  @echo "" && sleep 2 && echo lsmtree_scee
+  /usr/bin/time -v ./build/tests/lsmtree/throughput/lsmtree_throughput_scee --total_ops={{cnt}}
+  @echo "" && sleep 2 && echo lsmtree_raw
+  /usr/bin/time -v ./build/tests/lsmtree/throughput/lsmtree_throughput_raw --total_ops={{cnt}}
+  @echo "" && sleep 2 && echo rocksdb
+  /usr/bin/time -v ./build/tests/lsmtree/throughput/rocksdb/rocksdb_bench --total_ops={{cnt}}
+
+lsmtree-bench-rdtsc cnt="4000000":
+  {{CMAKE}} -B build -S . {{common_flags_release}} \
+    -DENABLE_LSMTREE=ON \
+    -DENABLE_SKIPLIST_PROFILING=ON \
+    -DENABLE_RUNTIME_PROFILING=OFF
+  just build
+  rm -rf /dev/shm/lsmtree*
+  rm -rf /dev/shm/rocksdb*
+  @echo "" && sleep 2 && echo lsmtree_scee
+  /usr/bin/time -v ./build/tests/lsmtree/throughput/lsmtree_throughput_scee --total_ops={{cnt}} > log.scee
+  @echo "" && sleep 2 && echo lsmtree_raw
+  /usr/bin/time -v ./build/tests/lsmtree/throughput/lsmtree_throughput_raw --total_ops={{cnt}}  > log.raw
+  python cmp_rdtsc.py
+
+lsmtree-bench-runtime-rdtsc cnt="4000000":
+  {{CMAKE}} -B build -S . {{common_flags_release}} \
+    -DENABLE_LSMTREE=ON \
+    -DENABLE_SKIPLIST_PROFILING=OFF \
+    -DENABLE_RUNTIME_PROFILING=ON
+  just build
+  rm -rf /dev/shm/lsmtree*
+  rm -rf /dev/shm/rocksdb*
+  @echo "" && sleep 2 && echo lsmtree_scee
+  ./build/tests/lsmtree/throughput/lsmtree_throughput_scee --total_ops={{cnt}} > log.scee
+  @echo "" && sleep 2 && echo lsmtree_raw
+  ./build/tests/lsmtree/throughput/lsmtree_throughput_raw --total_ops={{cnt}}  > log.raw
+  python cmp_rdtsc.py
+
+
+
+test-fj:
+

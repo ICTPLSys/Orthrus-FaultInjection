@@ -1,0 +1,124 @@
+diff --git a/include/free_log.hpp b/include/free_log.hpp
+index 154f312..cef23b2 100644
+--- a/include/free_log.hpp
++++ b/include/free_log.hpp
+@@ -10,6 +10,7 @@
+ 
+ #include "compiler.hpp"
+ #include "memmgr.hpp"
++#include "spin_lock.hpp"
+ #include "utils.hpp"
+ 
+ namespace scee {
+@@ -19,7 +20,7 @@ struct FreeLogEntry {
+     uint64_t timestamp;
+ };
+ 
+-class FreeLog;
++struct FreeLog;
+ void thread_gc(FreeLog *log);
+ 
+ constexpr uint64_t GC_TICK_CYCLES = 0x100000;
+@@ -40,10 +41,12 @@ struct alignas(CACHELINE_SIZE) FreeLog {
+     }
+ 
+     void push(void *ptr) {
++    retry:
+         entries[back] = {ptr, current_gc_tsc()};
+         back = (back + 1) % MAX_SIZE;
+         if (unlikely(full())) {
+             thread_gc(this);
++            goto retry;
+         }
+     }
+ 
+@@ -63,6 +66,7 @@ struct ClosureStartLog {
+     static constexpr size_t MAX_TSC_INTERVAL = GC_TICK_CYCLES * MAX_SIZE;
+ 
+     std::atomic_size_t closure_count[MAX_SIZE];
++    SpinLock spin_lock;
+     uint64_t earliest_tsc;
+ 
+     ClosureStartLog() {
+@@ -105,19 +109,24 @@ struct ClosureStartLog {
+     }
+ 
+     uint64_t poll_earliest_tsc() {
++        if (!spin_lock.TryLock()) {
++            return earliest_tsc;
++        }
+         uint64_t tsc = poll_earliest_tsc_impl();
+         earliest_tsc = tsc;
++        spin_lock.Unlock();
+         return tsc;
+     }
+ };  // namespace scee
+ 
+ struct ThreadGC {
+     FreeLog free_log;
+-    ClosureStartLog closure_start_log;
++    SpinLock spin_lock;
+ };
+ 
+ extern thread_local ThreadGC thread_gc_instance;
+ extern thread_local ThreadGC *app_thread_gc_instance;
++extern ClosureStartLog closure_start_log;
+ 
+ inline void ClosureStartLog::validated_closure(uint64_t tsc, FreeLog *log) {
+     closure_count[tsc % MAX_SIZE].fetch_sub(1, std::memory_order_relaxed);
+@@ -131,7 +140,8 @@ inline void thread_gc(FreeLog *log) {
+     if (gc_instance == nullptr) {
+         gc_instance = &thread_gc_instance;
+     }
+-    uint64_t earliest_tsc = gc_instance->closure_start_log.poll_earliest_tsc();
++    if (!gc_instance->spin_lock.TryLock()) return;
++    uint64_t earliest_tsc = closure_start_log.poll_earliest_tsc();
+     while (!log->empty()) {
+         const auto *entry = log->peek();
+         if (entry->timestamp < earliest_tsc) {
+@@ -141,6 +151,7 @@ inline void thread_gc(FreeLog *log) {
+             break;
+         }
+     }
++    gc_instance->spin_lock.Unlock();
+ }
+ 
+ }  // namespace scee
+\ No newline at end of file
+diff --git a/include/log.hpp b/include/log.hpp
+index 154a760..9a9ed94 100644
+--- a/include/log.hpp
++++ b/include/log.hpp
+@@ -123,8 +123,8 @@ inline void *allocate_log_buffer() {
+ 
+ // reclaim a log
+ inline void reclaim_log(LogHead *log) {
+-    app_thread_gc_instance->closure_start_log.validated_closure(
+-        log->gc_tsc, &app_thread_gc_instance->free_log);
++    closure_start_log.validated_closure(log->gc_tsc,
++                                        &app_thread_gc_instance->free_log);
+     LogBufferHead *buffer = get_log_buffer_head(log);
+     buffer->nr_reclaimed.fetch_add(1, std::memory_order_relaxed);
+     // check `in_use` first to avoid false sharing
+@@ -220,7 +220,7 @@ inline void new_log() {
+     // allocate a new log
+     LogHead *log = manager->allocator.allocate();
+     log->reclaimed = 0;
+-    log->gc_tsc = thread_gc_instance.closure_start_log.new_closure();
++    log->gc_tsc = closure_start_log.new_closure();
+     manager->current_log.head = log;
+     manager->current_log.cursor = add_byte_offset(log, sizeof(LogHead));
+ }
+diff --git a/scee.cpp b/scee.cpp
+index 5dcb201..189f421 100644
+--- a/scee.cpp
++++ b/scee.cpp
+@@ -14,6 +14,7 @@ thread_local LogQueue log_queue;
+ // free_log.hpp
+ thread_local ThreadGC thread_gc_instance;
+ thread_local ThreadGC *app_thread_gc_instance = nullptr;
++ClosureStartLog closure_start_log;
+ 
+ // log.hpp
+ SpinLock GlobalLogBufferAllocator::spin_lock;
+

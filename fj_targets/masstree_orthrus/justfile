@@ -1,0 +1,6 @@
+
+config:
+  cmake -B build -S . -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+build:
+  cmake --build build

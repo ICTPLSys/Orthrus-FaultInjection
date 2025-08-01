@@ -1,0 +1,94 @@
+---
+# Configure clang-tidy for this project.
+
+# Here is an explanation for why some of the checks are disabled:
+#
+#  -google-readability-namespace-comments: the *_CLIENT_NS is a macro, and
+#      clang-tidy fails to match it against the initial value.
+#
+#  -modernize-use-trailing-return-type: clang-tidy recommends using
+#      `auto Foo() -> std::string { return ...; }`, we think the code is less
+#      readable in this form.
+#
+#  -modernize-return-braced-init-list: We think removing typenames and using
+#      only braced-init can hurt readability.
+#
+#  -performance-move-const-arg: This warning requires the developer to
+#      know/care more about the implementation details of types/functions than
+#      should be necessary. For example, `A a; F(std::move(a));` will trigger a
+#      warning IFF `A` is a trivial type (and therefore the move is
+#      meaningless). It would also warn if `F` accepts by `const&`, which is
+#      another detail that the caller need not care about.
+#
+#  -readability-redundant-declaration: A friend declaration inside a class
+#      counts as a declaration, so if we also declare that friend outside the
+#      class in order to document it as part of the public API, that will
+#      trigger a redundant declaration warning from this check.
+#
+Checks: >
+  -*,
+  bugprone-*,
+  google-*,
+  misc-*,
+  modernize-*,
+  performance-*,
+  portability-*,
+  readability-*,
+  -bugprone-implicit-widening-of-multiplication-result,
+  -modernize-use-nodiscard,
+  -modernize-avoid-c-arrays,
+  -modernize-return-braced-init-list,
+  -modernize-use-trailing-return-type,
+  -readability-magic-numbers,
+  -readability-named-parameter,
+  -readability-identifier-length,
+  -readability-redundant-declaration,
+  -readability-redundant-control-flow,
+  -readability-implicit-bool-conversion,
+  -readability-braces-around-statements,
+  -readability-redundant-access-specifiers,
+  -readability-redundant-member-init,
+  -readability-duplicate-include,
+  -bugprone-easily-swappable-parameters,
+  -performance-move-const-arg,
+  -misc-definitions-in-headers,
+  -misc-non-private-member-variables-in-classes,
+  -google-readability-casting,
+  -google-readability-braces-around-statements,
+  -google-readability-namespace-comments,
+  -google-runtime-references,
+  -google-build-using-namespace,
+  -performance-no-int-to-ptr,
+  -unused-includes
+
+# Turn all the warnings from the checks above into errors.
+# WarningsAsErrors: "*"
+
+# TODO(#205) - Enable clang-tidy checks in our headers.
+#    HeaderFilterRegex: "google/cloud/.*"
+
+CheckOptions:
+  # - { key: readability-identifier-naming.NamespaceCase,          value: lower_case }
+  # - { key: readability-identifier-naming.ClassCase,              value: CamelCase  }
+  # - { key: readability-identifier-naming.StructCase,             value: CamelCase  }
+  # - { key: readability-identifier-naming.TemplateParameterCase,  value: CamelCase  }
+  # - { key: readability-identifier-naming.FunctionCase,           value: aNy_CasE  }
+  # - { key: readability-identifier-naming.VariableCase,           value: lower_case }
+  # - { key: readability-identifier-naming.ClassMemberCase,        value: lower_case }
+  # - { key: readability-identifier-naming.ClassMemberSuffix,      value: _          }
+  # - { key: readability-identifier-naming.PrivateMemberSuffix,    value: _          }
+  # - { key: readability-identifier-naming.ProtectedMemberSuffix,  value: _          }
+  # - { key: readability-identifier-naming.MacroDefinitionCase,    value: UPPER_CASE }
+  # - { key: readability-identifier-naming.EnumConstantCase,         value: CamelCase }
+  # - { key: readability-identifier-naming.EnumConstantPrefix,       value: k         }
+  # - { key: readability-identifier-naming.ConstexprVariableCase,    value: CamelCase }
+  # - { key: readability-identifier-naming.ConstexprVariablePrefix,  value: k         }
+  # - { key: readability-identifier-naming.GlobalConstantCase,       value: CamelCase }
+  # - { key: readability-identifier-naming.GlobalConstantPrefix,     value: k         }
+  # - { key: readability-identifier-naming.MemberConstantCase,       value: CamelCase }
+  # - { key: readability-identifier-naming.MemberConstantPrefix,     value: k         }
+  # - { key: readability-identifier-naming.StaticConstantCase,       value: CamelCase }
+  # - { key: readability-identifier-naming.StaticConstantPrefix,     value: k         }
+  # - { key: readability-implicit-bool-conversion.AllowIntegerConditions,  value: 1   }
+  # - { key: readability-implicit-bool-conversion.AllowPointerConditions,  value: 1   }
+  - { key: readability-identifier-naming.VariableHungarianPrefix,  value:  ON       }

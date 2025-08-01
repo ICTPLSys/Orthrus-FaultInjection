@@ -1,0 +1,24 @@
+
+
+run-debug tag="default-test-debug":
+  LOG_LEVEL=DEBUG python test_ng.py \
+    --debug \
+    --test-type test \
+    --temp-dir ../tests/ \
+    --scee-dir ../fake-test/ \
+    --llvm-dir ../llvm16 \
+    -t-build 1 \
+    -t-test 1 \
+    {{tag}}
+
+
+run tag="default-test":
+  LOG_LEVEL=INFO python test_ng.py \
+    --test-type test \
+    --temp-dir ../tests/ \
+    --scee-dir ../fake-test/ \
+    --llvm-dir ../llvm16 \
+    -t-build 16 \
+    -t-test 128 \
+    {{tag}}
+

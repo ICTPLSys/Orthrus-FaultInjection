@@ -1,0 +1,9 @@
+[submodule "third/HdrHistogram_c"]
+	url = https://github.com/HdrHistogram/HdrHistogram_c.git
+	path = third/HdrHistogram_c
+[submodule "third/mimalloc"]
+	path = third/mimalloc
+	url = https://github.com/microsoft/mimalloc.git
+[submodule "llvm"]
+	path = llvm
+	url = https://github.com/Orthrus-SOSP25/llvm_project.git

@@ -1,0 +1,2 @@
+Diagnostics:
+  UnusedIncludes: None  # 完全禁用未使用头文件的警告

@@ -1,0 +1,225 @@
+#include <boost/program_options.hpp>
+#include <chrono>
+#include <cstdio>
+#include <iomanip>
+#include <iostream>
+#include <utility>
+#include <cassert>
+
+#include "scee.hpp"
+#include "thread.hpp"
+#include "wc.hpp"
+
+inline bool key_equal(const word& w, std::string_view k) {
+    return w.size == k.size() && std::memcmp(w.data.deref(), k.data(), w.size) == 0;
+}
+
+namespace raw {
+#include "closure.hpp"
+}  // namespace raw
+namespace app {
+#include "closure.hpp"
+}  // namespace app
+namespace validator {
+#include "closure.hpp"
+}  // namespace validator
+
+struct Args {
+    std::string input_file;
+    map_reduce_config config;
+};
+
+Args parse_args(int argc, char **argv) {
+    namespace po = boost::program_options;
+    po::options_description desc("Allowed options");
+    // clang-format off
+    desc.add_options()
+        ("help,h", "produce help message")
+        ("input,i", po::value<std::string>(), "input file")
+        ("num-buckets,b", po::value<size_t>()->default_value(64),
+         "number of buckets")
+        ("num-mappers,m", po::value<size_t>()->default_value(1),
+         "number of mappers")
+        ("num-reducers,r", po::value<size_t>()->default_value(1),
+         "number of reducers");
+    // clang-format on
+
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
+
+    if (vm.count("help")) {
+        std::cout << desc << std::endl;
+        exit(0);
+    }
+
+    if (!vm.count("input")) {
+        std::cerr << "Error: input file is required" << std::endl;
+        std::cout << desc << std::endl;
+        exit(1);
+    }
+
+    return Args{vm["input"].as<std::string>(),
+                {
+                    .n_mappers = vm["num-mappers"].as<size_t>(),
+                    .n_reducers = vm["num-reducers"].as<size_t>(),
+                    .n_buckets = vm["num-buckets"].as<size_t>(),
+                }};
+}
+
+// TODO(liquanxi): should we make this a closure?
+std::pair<char *, size_t> load_file(const std::string &file_path) {
+    FILE *file = fopen(file_path.c_str(), "r");
+    if (!file) {
+        std::cerr << "Error: failed to open input file" << std::endl;
+        exit(1);
+    }
+
+    fseek(file, 0, SEEK_END);
+    size_t file_size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    std::cout << "Loading file, size: " << file_size << " bytes" << std::endl;
+
+    char *buffer = (char *)malloc(file_size);
+    fread(buffer, 1, file_size, file);
+    fclose(file);
+    std::cout << "File loaded" << std::endl;
+
+    return {buffer, file_size};
+}
+
+int main_fn(const char *buffer, size_t file_size, map_reduce_config config) {
+    auto start_time = rdtsc();
+    // split
+    std::vector<std::string_view> splits;
+    splits.reserve(config.n_mappers);
+    size_t split_size = file_size / config.n_mappers;
+    const char *const end = buffer + file_size;
+    const char *cursor = buffer;
+    for (size_t i = 0; i < config.n_mappers; ++i) {
+        const char *const split_start = cursor;
+        const char *split_end;
+        if (i == config.n_mappers - 1) {
+            split_end = end;
+        } else {
+            split_end = buffer + split_size * (i + 1);
+            if (split_end <= cursor) {
+                split_end = cursor;
+            }
+            while (split_end < end && !std::isspace(*split_end)) {
+                ++split_end;
+            }
+        }
+        splits.emplace_back(split_start, split_end - split_start);
+        assert(split_end <= end);
+        cursor = split_end;
+    }
+    auto end_split_time = rdtsc();
+
+    // map
+    auto map_results =
+        __scee_run(create_result_array, config.n_mappers * config.n_reducers);
+    std::vector<scee::AppThread> mapper_threads;
+    mapper_threads.reserve(config.n_mappers);
+    for (size_t i = 0; i < config.n_mappers; ++i) {
+        mapper_threads.emplace_back([&, i] {
+            __scee_run(word_count_map_worker, splits[i], map_results, i,
+                       config);
+        });
+    }
+    for (size_t i = 0; i < config.n_mappers; ++i) {
+        mapper_threads[i].join();
+    }
+    auto end_map_time = rdtsc();
+
+    // reduce
+    auto reduce_results = __scee_run(create_result_array, config.n_reducers);
+    std::vector<scee::AppThread> reducer_threads;
+    reducer_threads.reserve(config.n_reducers);
+    for (size_t i = 0; i < config.n_reducers; ++i) {
+        reducer_threads.emplace_back([&, i] {
+            __scee_run(word_count_reduce_worker, map_results, reduce_results, i,
+                       config);
+        });
+    }
+    for (size_t i = 0; i < config.n_reducers; ++i) {
+        reducer_threads[i].join();
+    }
+    __scee_run(destroy_result_array, map_results);
+    auto end_reduce_time = rdtsc();
+
+    // sort
+    auto [final_results, final_result_size] =
+        __scee_run(sort_results, reduce_results, config);
+
+    // calculate word frequency
+    // __scee_run(calculate_word_frequency, final_results, final_result_size);
+    auto wf = __scee_run(calc_each_word_frequency, final_results, final_result_size);
+    printf("wf: %f\n", wf);
+
+    auto average_length = __scee_run(calc_average_length, final_results, final_result_size);
+    printf("average length: %f\n", average_length);
+
+    auto average_frequency = __scee_run(calc_average_frequency, final_results, final_result_size);
+    printf("average frequency: %f\n", average_frequency);
+
+    auto standard_deviation = __scee_run(calc_standard_deviation, final_results, final_result_size);
+    printf("standard deviation: %f\n", standard_deviation);
+
+    sleep(1);
+
+    if (wf > 0.04 || wf < 0.02) {
+        fprintf(stderr, "SDC Not Detected\n");
+    }
+
+    if (average_length > 4.05 || average_length < 4.03) {
+        fprintf(stderr, "SDC Not Detected\n");
+    }
+
+    if (average_frequency > 4.001 || average_frequency < 3.999) {
+        fprintf(stderr, "SDC Not Detected\n");
+    }
+
+    if (standard_deviation > 1.01 || standard_deviation < 0.99) {
+        fprintf(stderr, "SDC Not Detected\n");
+    }
+
+    // printf("SDC Detected\n");
+
+    __scee_run(destroy_result_array, reduce_results);
+
+    auto end_time = rdtsc();
+    std::cout << std::setw(16)
+              << "Time taken: " << microsecond(start_time, end_time) / 1000
+              << " ms" << std::endl;
+    std::cout << std::setw(16)
+              << "Split: " << microsecond(start_time, end_split_time) / 1000
+              << " ms" << std::endl;
+    std::cout << std::setw(16)
+              << "Map: " << microsecond(end_split_time, end_map_time) / 1000
+              << " ms" << std::endl;
+    std::cout << std::setw(16)
+              << "Reduce: " << microsecond(end_map_time, end_reduce_time) / 1000
+              << " ms" << std::endl;
+    std::cout << std::setw(16)
+              << "Sort: " << microsecond(end_reduce_time, end_time) / 1000
+              << " ms" << std::endl;
+
+    // print
+    printf("%zu unique words\n", final_result_size);
+    printf("final results:\n");
+
+    return 0;
+}
+
+int main(int argc, char **argv) {
+    auto args = parse_args(argc, argv);
+    auto start_load_time = rdtsc();
+    auto [buffer, file_size] = load_file(args.input_file);
+    auto end_load_time = rdtsc();
+    printf("Load time: %zu ms\n",
+           microsecond(start_load_time, end_load_time) / 1000);
+    int ret = scee::main_thread(main_fn, buffer, file_size, args.config);
+    free(buffer);
+    return ret;
+}
