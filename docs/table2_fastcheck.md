@@ -1,6 +1,6 @@
 ## Fault Injection: Fast check results of Table2
 
-The full test process for Table 2 is time-consuming. To demonstrate that the detection rates reported in Table 2 can be achieved, we use FastCheck, which generates jishi results for each entry in Table 2 with similar detection rates.
+The full test process for Table 2 is time-consuming. To demonstrate that the detection rates reported in Table 2 can be achieved, we use FastCheck, which generates results for each entry in Table 2 with similar detection rates.
 
 A detailed description of our fault injection methodology is available in table2_full.md. For FastCheck, run the script:
 
