@@ -1,11 +1,11 @@
 
-# Prerequisities
+# Prerequisites
 
-We evaluate Orthrus throughly on Ubuntu 20.04. If you are using a similiar OS release, you can refer to commands below. Else, you can download related packages yourself.
+We evaluate Orthrus throughly on Ubuntu 20.04. If you are using a similar OS release, you can refer to the commands below. Otherwise, you can download related packages yourself.
 
-Not that you should use camke version >= 3.20.
+Note that you should use cmake version >= 3.20.
 
-## Enviroment For Performance Test
+## Environment For Performance Test
 
 ```shell
 apt update
