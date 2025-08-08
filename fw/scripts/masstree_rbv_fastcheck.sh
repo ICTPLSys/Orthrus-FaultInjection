@@ -1,33 +1,39 @@
 #! /bin/bash
 
+rm -rf tests/masstree_comp_rbv_fastcheck/
+rm -rf tests/masstree_cons_rbv_fastcheck/
+
 LOG_LEVEL=INFO python test_ng.py \
-    --tag masstree_comp_orthrus \
+    --tag masstree_comp_rbv_fastcheck \
     --debug \
     --test-type masstree \
     --temp-dir ./tests/ \
-    --scee-dir /home/xiayanwen/scee/masstree/ \
-    --llvm-dir ~/.local/dev/llvm16/ \
+    --scee-dir ${CWD}/fj_targets/masstree_rbv/ \
+    --llvm-dir ${LLVM_INSTALL_PATH} \
     --t-build 40 \
     --t-test 40 \
     --category computational \
-    --fj-functions both \
-    --ft-type orthrus \
-    --output output/masstree_comp_orthrus.json > logs/masstree_comp_orthrus.log 2>&1
+    --fj-functions onlyapp \
+    --ft-type rbv_fastcheck \
+    --test_mode lite \
+    --output output/masstree_comp_rbv_fastcheck.json > logs/masstree_comp_rbv_fastcheck.log 2>&1
 
-# wait 
+wait 
 
-# echo "second start"
+LOG_LEVEL=INFO python test_ng.py \
+    --tag masstree_cons_rbv_fastcheck \
+    --debug \
+    --test-type masstree \
+    --temp-dir ./tests/ \
+    --scee-dir ${CWD}/fj_targets/masstree_rbv/ \
+    --llvm-dir ${LLVM_INSTALL_PATH} \
+    --t-build 40 \
+    --t-test 40 \
+    --category consistency \
+    --fj-functions onlyapp \
+    --ft-type rbv_fastcheck \
+    --test_mode lite \
+    --output output/masstree_cons_rbv_fastcheck.json > logs/masstree_cons_rbv_fastcheck.log 2>&1
 
-# LOG_LEVEL=INFO python test_ng.py \
-#     --tag masstree_cons_orthrus \
-#     --debug \
-#     --test-type masstree \
-#     --temp-dir ./tests/ \
-#     --scee-dir /home/xiayanwen/scee/masstree/ \
-#     --llvm-dir ~/.local/dev/llvm16/ \
-#     --t-build 40 \
-#     --t-test 40 \
-#     --category consistency \
-#     --fj-functions both \
-#     --ft-type orthrus \
-#     --output output/masstree_cons_orthrus.json > logs/masstree_cons_orthrus.log 2>&1
+python3 parse.py tests/masstree_comp_rbv_fastcheck/cache/func_fj_infos.json  output/masstree_comp_rbv_fastcheck.json masstree_rbv_computational
+python3 parse.py tests/masstree_cons_rbv_fastcheck/cache/func_fj_infos.json  output/masstree_cons_rbv_fastcheck.json masstree_rbv_consistency

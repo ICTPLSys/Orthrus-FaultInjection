@@ -24,6 +24,7 @@ endif()
 find_package(Threads REQUIRED)
 # https://github.com/microsoft/mimalloc
 find_package(mimalloc REQUIRED)
+find_package(Boost 1.85.0 REQUIRED COMPONENTS program_options)
 
 add_subdirectory(third/isal-crc)
 
@@ -31,9 +32,9 @@ include_directories(include)
 include_directories(third/isal-crc/include)
 
 add_library(scee scee.cpp)
-target_link_libraries(scee PRIVATE isal-crc mimalloc)
+target_link_libraries(scee PRIVATE isal-crc mimalloc Boost::program_options)
 
-set(LIBS scee Threads::Threads isal-crc mimalloc)
+set(LIBS scee Threads::Threads isal-crc mimalloc Boost::program_options)
 
 add_subdirectory(examples)
 add_subdirectory(benchmarks)

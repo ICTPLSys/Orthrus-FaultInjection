@@ -36,7 +36,8 @@ find_package(mimalloc REQUIRED)
 # https://github.com/HdrHistogram/HdrHistogram_c.git
 find_package(hdr_histogram REQUIRED)
 
-find_package(Boost REQUIRED COMPONENTS program_options)
+find_package(Boost 1.85.0 REQUIRED COMPONENTS program_options)
+
 
 add_subdirectory(third/isal-crc)
 include_directories(third/isal-crc/include)
@@ -59,46 +60,46 @@ set(LIBS_deps Threads::Threads isal-crc mimalloc-static)
 # SCEE lib
 set(TARGET scee)
 add_library(${TARGET} scee.cpp)
-target_link_libraries(${TARGET} PRIVATE  mimalloc-static)
-set(LIBS ${TARGET} ${LIBS_deps} profile-disable)
+target_link_libraries(${TARGET} PRIVATE  mimalloc-static Boost::program_options)
+set(LIBS ${TARGET} ${LIBS_deps} profile-disable Boost::program_options)
 
 # SCEE lib, but enable profile
 set(TARGET scee_profile)
 add_library(${TARGET} scee.cpp)
-target_link_libraries(${TARGET} PRIVATE  mimalloc-static profile)
-set(LIBS_profile ${TARGET} ${LIBS_deps} profile)
+target_link_libraries(${TARGET} PRIVATE  mimalloc-static profile Boost::program_options)
+set(LIBS_profile ${TARGET} ${LIBS_deps} profile Boost::program_options)
 
 # SCEE lib disable check
 set(TARGET scee_nocheck)
 add_library(${TARGET} scee.cpp)
-target_link_libraries(${TARGET} PRIVATE  mimalloc-static profile-disable)
+target_link_libraries(${TARGET} PRIVATE  mimalloc-static profile-disable Boost::program_options)
 target_compile_definitions(${TARGET} PUBLIC DISABLE_VALIDATION)
-set(LIBS_nocheck ${TARGET} ${LIBS_deps})
+set(LIBS_nocheck ${TARGET} ${LIBS_deps} Boost::program_options)
 
 # SCEE lib disable scee
 set(TARGET scee_disabled)
 add_library(${TARGET} scee.cpp)
-target_link_libraries(${TARGET} PRIVATE  mimalloc-static profile-disable)
+target_link_libraries(${TARGET} PRIVATE  mimalloc-static profile-disable Boost::program_options)
 target_compile_definitions(${TARGET} PRIVATE DISABLE_SCEE)
-set(LIBS_disabled scee_disabled Threads::Threads  mimalloc-static profile-disable)
+set(LIBS_disabled scee_disabled Threads::Threads  mimalloc-static profile-disable Boost::program_options)
 
 set(TARGET scee_disabled_profile)
 add_library(${TARGET} scee.cpp)
-target_link_libraries(${TARGET} PRIVATE  mimalloc-static profile)
+target_link_libraries(${TARGET} PRIVATE  mimalloc-static profile Boost::program_options)
 target_compile_definitions(${TARGET} PRIVATE DISABLE_SCEE)
-set(LIBS_disabled_profile scee_disabled_profile Threads::Threads  mimalloc-static profile)
+set(LIBS_disabled_profile scee_disabled_profile Threads::Threads  mimalloc-static profile Boost::program_options)
 
 set(TARGET scee_sampling)
 add_library(${TARGET} scee.cpp)
-target_link_libraries(${TARGET} PRIVATE mimalloc-static profile-disable)
+target_link_libraries(${TARGET} PRIVATE mimalloc-static profile-disable Boost::program_options)
 target_compile_definitions(${TARGET} PRIVATE SAMPLING)
-set(LIBS_sampling scee_sampling Threads::Threads  mimalloc-static profile-disable)
+set(LIBS_sampling scee_sampling Threads::Threads  mimalloc-static profile-disable Boost::program_options)
 
 set(TARGET scee_sampling_profile)
 add_library(${TARGET} scee.cpp)
-target_link_libraries(${TARGET} PRIVATE mimalloc-static profile)
+target_link_libraries(${TARGET} PRIVATE mimalloc-static profile Boost::program_options)
 target_compile_definitions(${TARGET} PRIVATE SAMPLING)
-set(LIBS_sampling_profile scee_sampling_profile Threads::Threads  mimalloc-static profile)
+set(LIBS_sampling_profile scee_sampling_profile Threads::Threads  mimalloc-static profile Boost::program_options)
 
 add_subdirectory(ae)
 # add_subdirectory(examples)

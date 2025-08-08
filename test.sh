@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 
+
 set -e
 
 echo -e "Please make sure you have setup the env via [sudo ./init.sh]"

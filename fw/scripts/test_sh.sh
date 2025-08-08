@@ -1,0 +1,11 @@
+#!/bin/bash
+
+CWD=$(pwd)
+HOME_PATH=$HOME
+FRAMEWORK_PATH=$CWD/fw
+LLVM_PATH=$CWD/llvm
+
+echo "CWD: $CWD"
+echo "HOME_PATH: $HOME_PATH"
+echo "FRAMEWORK_PATH: $FRAMEWORK_PATH"
+echo "LLVM_PATH: $LLVM_PATH"

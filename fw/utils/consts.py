@@ -1,3 +1,4 @@
-MAX_TIMEOUT = 5
+# make this configurable
+MAX_TIMEOUT = 3
 
 FLAG_debug = False

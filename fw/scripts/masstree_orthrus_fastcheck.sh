@@ -8,8 +8,8 @@ LOG_LEVEL=INFO python test_ng.py \
     --debug \
     --test-type masstree \
     --temp-dir ./tests/ \
-    --scee-dir /home/xiayanwen/scee/masstree/ \
-    --llvm-dir ~/.local/dev/llvm16/ \
+    --scee-dir ${CWD}/fj_targets/masstree_orthrus/ \
+    --llvm-dir ${LLVM_INSTALL_PATH} \
     --t-build 40 \
     --t-test 40 \
     --category computational \
@@ -18,17 +18,15 @@ LOG_LEVEL=INFO python test_ng.py \
     --test_mode lite \
     --output output/masstree_comp_orthrus_fastcheck.json > logs/masstree_comp_orthrus_fastcheck.log 2>&1
 
-wait 
-
-echo "second start"
+wait
 
 LOG_LEVEL=INFO python test_ng.py \
     --tag masstree_cons_orthrus_fastcheck \
     --debug \
     --test-type masstree \
     --temp-dir ./tests/ \
-    --scee-dir /home/xiayanwen/scee/masstree/ \
-    --llvm-dir ~/.local/dev/llvm16/ \
+    --scee-dir ${CWD}/fj_targets/masstree_orthrus/ \
+    --llvm-dir ${LLVM_INSTALL_PATH} \
     --t-build 40 \
     --t-test 40 \
     --category consistency \

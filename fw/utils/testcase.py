@@ -60,7 +60,7 @@ class TestCase:
         self.env["FJ_CONFIG"] = self.fj_conf_path.absolute()
 
         logger.debug(f"exec: cmd={cmd}, cwd={cwd}")
-        rc, out, err = custom_run(cmd, cwd=cwd, env=self.env)
+        rc, out, err = custom_run(cmd, cwd=cwd, env=self.env, timeout=consts.MAX_TIMEOUT)
         logger.info(f"{self.name} {tag} result: {rc}")
 
         return rc, out, err

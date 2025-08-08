@@ -56,13 +56,14 @@ def custom_run_new(cmd, cwd, env, output_path, **kwargs) -> Tuple[int, str, str]
     return rc, out, err
 
 
-def custom_run(cmd, cwd, env, **kwargs) -> Tuple[int, str, str]:
+def custom_run(cmd, cwd, env, timeout=consts.MAX_TIMEOUT, **kwargs) -> Tuple[int, str, str]:
     # logger.debug(f"Custom run: {cmd}, {cwd}, {env}, {kwargs}")
     result_dict = multiprocessing.Manager().dict()
     logger.debug(f"Custom run: {cmd}, {cwd}")
     
     # add a process to handle the timeout
-    timeout_str = f"{consts.MAX_TIMEOUT}m"
+    
+    timeout_str = f"{timeout}m"
     cmd = ['timeout', timeout_str] + [str(cmd[0])] + cmd[1:]
     
     logger.debug(f"cmd is {cmd}")

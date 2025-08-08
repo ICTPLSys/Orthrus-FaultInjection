@@ -261,7 +261,7 @@ class Config:
         if separate_profile:
             if self.test_mode == "lite":
                 # randomly select 50 of the pc_infos
-                lite_pc_infos = random.sample(pc_infos, 500)
+                lite_pc_infos = random.sample(pc_infos, 100)
                 logger.info(f"randomly selected {len(lite_pc_infos)} pc_infos")
                 try:
                     # if 99% of the tasks have finished, then exit

@@ -12,10 +12,7 @@
 #   - {FRAMEWORK_PATH}/output/ result file for each line
 #   - {FRAMEWORK_PATH}/tests/ testcases, intermediate files
 
-HOME_PATH=
-FRAMEWORK_PATH=
-LLVM_PATH=
-
+source table2_env.sh
 
 ###### START ######
 
@@ -23,37 +20,37 @@ LLVM_PATH=
 pushd $FRAMEWORK_PATH
 
 # Run FJ for HASHMAP-Orthrus
-./scripts/fj_hashmap_orthrus_fastcheck.sh
+./scripts/memcached_orthrus_fastcheck.sh
 
-wait
-# Run FJ for HASHMAP-RBV
-./scripts/fj_hashmap_rbv_fastcheck.sh
+# wait
+# # Run FJ for HASHMAP-RBV
+./scripts/memcached_rbv_fastcheck.sh
 
-wait
-# Run FJ for MASSTREE-Orthrus
-./scripts/fj_masstree_orthrus_fastcheck.sh
+# wait
+# # Run FJ for MASSTREE-Orthrus
+./scripts/masstree_orthrus_fastcheck.sh
 
-wait
-# Run FJ for MASSTREE-RBV
-./scripts/fj_masstree_rbv_fastcheck.sh
+# wait
+# # Run FJ for MASSTREE-RBV
+./scripts/masstree_orthrus_fastcheck.sh
 
-wait
-# Run FJ for LSMTree-Orthrus
-./scripts/fj_lsmtree_orthrus_fastcheck.sh
+# wait
+# # Run FJ for LSMTree-Orthrus
+./scripts/lsmtree_orthrus_fastcheck.sh
 
-wait
-# Run FJ for LSMTree-RBV
-./scripts/fj_lsmtree_rbv_fastcheck.sh
+# wait
+# # Run FJ for LSMTree-RBV
+./scripts/lsmtree_rbv_fastcheck.sh
 
-wait
-# Run FJ for WordCount-Orthrus
-./scripts/fj_wordcount_orthrus_fastcheck.sh
+# wait
+# # Run FJ for WordCount-Orthrus
+./scripts/wordcount_orthrus_fastcheck.sh
 
-wait
-# Run FJ for WordCount-RBV
-./scripts/fj_wordcount_rbv_fastcheck.sh
+# wait
+# # Run FJ for WordCount-RBV
+./scripts/wordcount_rbv_fastcheck.sh
 
-wait
+# wait
 popd
 
 ###### END ######
