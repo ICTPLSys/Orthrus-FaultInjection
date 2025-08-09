@@ -8,6 +8,7 @@
 
 namespace NAMESPACE {
 using namespace lsmtree;
+
 int lsmtree_set(void *lsm, int64_t k, int64_t v) {
     auto *tmp = reinterpret_cast<lsmtree::LSMTree *>(lsm);
     auto ret = (int)tmp->Set(k, v);
@@ -22,6 +23,72 @@ int64_t lsmtree_get(void *lsm, int64_t k) {
 int lsmtree_del(void *lsm, int64_t k) {
     auto *tmp = reinterpret_cast<lsmtree::LSMTree *>(lsm);
     return (int)tmp->Del(k);
+}
+
+static __attribute__((target("sse4.2"))) uint32_t kompute_crc32_local(
+    const void* data, std::size_t length) {
+    std::uint32_t crc = ~0U;
+    const auto* buffer = static_cast<const unsigned char*>(data);
+
+    while (length > 0 && reinterpret_cast<std::uintptr_t>(buffer) % 8 != 0) {
+        crc = _mm_crc32_u8(crc, *buffer);
+        buffer++;
+        length--;
+    }
+
+    const auto* buffer64 = reinterpret_cast<const std::uint64_t*>(buffer);
+    while (length >= 8) {
+        crc = _mm_crc32_u64(crc, *buffer64);
+        buffer64++;
+        length -= 8;
+    }
+
+    buffer = reinterpret_cast<const unsigned char*>(buffer64);
+
+    if (length >= 4) {
+        auto value32 = *reinterpret_cast<const std::uint32_t*>(buffer);
+        crc = _mm_crc32_u32(crc, value32);
+        buffer += 4;
+        length -= 4;
+    }
+
+    if (length >= 2) {
+        auto value16 = *reinterpret_cast<const std::uint16_t*>(buffer);
+        crc = _mm_crc32_u16(crc, value16);
+        buffer += 2;
+        length -= 2;
+    }
+
+    if (length > 0) {
+        crc = _mm_crc32_u8(crc, *buffer);
+    }
+
+    return ~crc;
+}
+
+double get_time_from_int64(int64_t v) {
+    double ret = 0;
+    ret += (double)(v / 24.0 / 60.0 / 60.0);
+    ret += (double)(v / 60.0 / 60.0);
+    ret += (double)(v / 60.0);
+    ret += (double)(v % 60);
+    return ret;
+}
+
+uint32_t get_crc32_from_int64(int64_t v) {
+    return kompute_crc32_local(&v, sizeof(v));
+}
+
+double lsmtree_get_as_time(void *lsm, int64_t k) {
+    auto *tmp = reinterpret_cast<lsmtree::LSMTree *>(lsm);
+    auto ret = tmp->Get(k);
+    return get_time_from_int64(ret);
+}
+
+uint32_t lsmtree_get_as_crc32(void *lsm, int64_t k) {
+    auto *tmp = reinterpret_cast<lsmtree::LSMTree *>(lsm);
+    auto ret = tmp->Get(k);
+    return get_crc32_from_int64(ret);
 }
 }
 

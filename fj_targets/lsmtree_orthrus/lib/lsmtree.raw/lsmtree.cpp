@@ -8,6 +8,8 @@
 
 namespace NAMESPACE {
 using namespace lsmtree;
+
+
 int lsmtree_set(void *lsm, int64_t k, int64_t v) {
     auto *tmp = reinterpret_cast<lsmtree::LSMTree *>(lsm);
     auto ret = (int)tmp->Set(k, v);
