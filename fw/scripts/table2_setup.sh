@@ -12,7 +12,7 @@ sudo apt install -y python3-pip libssl-dev lzma libsqlite3-dev
 
 mkdir -p $HOME_PATH/data
 
-cp $(CWD)/fj_targets/wordcount_orthrus/benchmarks/word_count/example.txt $HOME_PATH/data/example.txt
+cp $CWD/fj_targets/wordcount_orthrus/benchmarks/word_count/example.txt $HOME_PATH/data/example.txt
 
 git submodule init
 git submodule update --recursive

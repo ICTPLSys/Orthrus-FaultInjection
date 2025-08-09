@@ -28,6 +28,15 @@ const InternalStates& lsmtree_get_internal_states(void* lsm) {
     auto *tmp = reinterpret_cast<lsmtree::LSMTree *>(lsm);
     return tmp->GetInternalStates();
 }
+
+double lsmtree_get_time_info(int64_t v) {
+    double ret = 0;
+    ret += v / (24.0 * 60.0 * 60.0);
+    ret += (v % (24 * 60 * 60)) / (60.0 * 60.0);
+    ret += (v % (60 * 60)) / 60.0;
+    ret += (v % 60);
+    return ret;
+}
 }
 
 

@@ -136,6 +136,9 @@ int main_fn() {
             f(lsm_replica_states);
         }
         ASSERT_EQ(is_same, true);
+        double time_info = app::lsmtree_get_time_info(value);
+        double time_info_2 = app::lsmtree_get_time_info(value);
+        ASSERT_EQ(time_info, time_info_2);
         // === end simulate rbv ===
 
         // === begin check rbv ===
@@ -162,6 +165,9 @@ int main_fn() {
         const auto& lsm_replica_states = validator::lsmtree_get_internal_states(lsm_replica);
         bool is_same = lsm_main_states == lsm_replica_states;
         ASSERT_EQ_FINAL(is_same, true);
+        double time_info = app::lsmtree_get_time_info(v2);
+        double time_info_2 = app::lsmtree_get_time_info(v2);
+        ASSERT_EQ_FINAL(time_info, time_info_2);
         // === end simulate rbv ===
 
         // === begin check rbv ===
