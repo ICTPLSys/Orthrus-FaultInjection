@@ -13,7 +13,7 @@ idea-build/
 
 build*/
 
-log.*
+*.log
 perf.*
 !results/**/*
 validation-latency-*.cdf

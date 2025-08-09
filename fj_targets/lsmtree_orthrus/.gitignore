@@ -11,7 +11,7 @@ idea-build/
 .envrc
 .pre-commit-config.yaml
 
-log.*
+*.log
 perf.*
 !results/**/*
 validation-latency-*.cdf
