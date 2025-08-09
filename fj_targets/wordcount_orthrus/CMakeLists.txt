@@ -23,13 +23,17 @@ endif()
 
 find_package(Threads REQUIRED)
 # https://github.com/microsoft/mimalloc
-find_package(mimalloc REQUIRED)
-find_package(Boost 1.85.0 REQUIRED COMPONENTS program_options)
-
-add_subdirectory(third/isal-crc)
+# find_package(mimalloc REQUIRED)
+add_subdirectory(third/mimalloc)
+find_package(Boost REQUIRED COMPONENTS program_options)
 
 include_directories(include)
+
+add_subdirectory(third/isal-crc)
 include_directories(third/isal-crc/include)
+
+add_subdirectory(third/HdrHistogram_c)
+include_directories(third/HdrHistogram_c/include)
 
 add_library(scee scee.cpp)
 target_link_libraries(scee PRIVATE isal-crc mimalloc Boost::program_options)

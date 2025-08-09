@@ -6,7 +6,7 @@ rm -rf tests/hashmap_cons_rbv_fastcheck/
 LOG_LEVEL=INFO python test_ng.py \
     --tag hashmap_comp_rbv_fastcheck \
     --debug \
-    --test-type hashmap \
+    --test-type hashmap_rbv \
     --temp-dir ./tests/ \
     --scee-dir ${CWD}/fj_targets/memcached_rbv/ \
     --llvm-dir ${LLVM_INSTALL_PATH} \
@@ -23,7 +23,7 @@ wait
 LOG_LEVEL=INFO python test_ng.py \
     --tag hashmap_cons_rbv_fastcheck \
     --debug \
-    --test-type hashmap \
+    --test-type hashmap_rbv \
     --temp-dir ./tests/ \
     --scee-dir ${CWD}/fj_targets/memcached_rbv/ \
     --llvm-dir ${LLVM_INSTALL_PATH} \

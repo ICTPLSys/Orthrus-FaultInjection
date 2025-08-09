@@ -14,7 +14,8 @@ endif()
 
 find_package(Threads REQUIRED)
 # https://github.com/microsoft/mimalloc
-find_package(mimalloc REQUIRED)
+# find_package(mimalloc REQUIRED)
+add_subdirectory(third/mimalloc)
 
 add_subdirectory(third/isal-crc)
 

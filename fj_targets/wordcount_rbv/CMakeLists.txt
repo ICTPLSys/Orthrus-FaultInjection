@@ -30,27 +30,30 @@ find_package(ZLIB REQUIRED)
 find_package(Threads REQUIRED)
 
 # https://github.com/microsoft/mimalloc
-find_package(mimalloc REQUIRED)
+# find_package(mimalloc REQUIRED)
+add_subdirectory(third/mimalloc)
 # add_library(mimalloc-static INTERFACE)
 
 # https://github.com/HdrHistogram/HdrHistogram_c.git
-find_package(hdr_histogram REQUIRED)
+# find_package(hdr_histogram REQUIRED)
+add_subdirectory(third/HdrHistogram_c)
+include_directories(third/HdrHistogram_c/include)
 
-find_package(Boost 1.85.0 REQUIRED COMPONENTS program_options)
+find_package(Boost REQUIRED COMPONENTS program_options)
 
 
 add_subdirectory(third/isal-crc)
 include_directories(third/isal-crc/include)
 
-add_subdirectory(third/HdrHistogram_c)
+# add_subdirectory(third/HdrHistogram_c)
 
 add_library(profile profile.cpp)
 target_compile_definitions(profile PRIVATE ENABLE_PROFILE=true)
-target_link_libraries(profile PRIVATE hdr_histogram::hdr_histogram_static)
+target_link_libraries(profile PRIVATE hdr_histogram_static)
 
 add_library(profile-disable profile.cpp)
 target_compile_definitions(profile-disable PRIVATE ENABLE_PROFILE=false)
-target_link_libraries(profile-disable PRIVATE hdr_histogram::hdr_histogram_static)
+target_link_libraries(profile-disable PRIVATE hdr_histogram_static)
 
 add_library(profile_mem profile-mem.cpp)
 target_compile_definitions(profile_mem PRIVATE ENABLE_PROFILE=true)

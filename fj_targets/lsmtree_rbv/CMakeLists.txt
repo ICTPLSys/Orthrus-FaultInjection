@@ -28,11 +28,14 @@ set(CMAKE_LD_FLAGS_RELEASE "${SANITIZE_FLAG} -pthread")
 find_package(Threads REQUIRED)
 
 # https://github.com/microsoft/mimalloc
-find_package(mimalloc REQUIRED)
+# find_package(mimalloc REQUIRED)
+add_subdirectory(third/mimalloc)
 # add_library(mimalloc-static INTERFACE)
 
 # git@github.com:HdrHistogram/HdrHistogram_c.git
-find_package(hdr_histogram REQUIRED)
+# find_package(hdr_histogram REQUIRED)
+add_subdirectory(third/HdrHistogram_c)
+include_directories(third/HdrHistogram_c/include)
 
 # add_subdirectory(third/isal-crc)
 # include_directories(third/isal-crc/include)
@@ -48,12 +51,12 @@ include_directories(include)
 
 add_library(profile-disable profile.cpp)
 target_compile_definitions(profile-disable PRIVATE ENABLE_PROFILE=false)
-target_link_libraries(profile-disable PRIVATE hdr_histogram::hdr_histogram_static)
+target_link_libraries(profile-disable PRIVATE hdr_histogram_static)
 
 # add_library(profile_mem profile-mem.cpp)
 # target_compile_definitions(profile_mem PRIVATE ENABLE_PROFILE=true)
 
-set(LIBS_deps Threads::Threads mimalloc-static)
+set(LIBS_deps Threads::Threads mimalloc-static pthread)
 
 # SCEE lib
 set(TARGET scee)

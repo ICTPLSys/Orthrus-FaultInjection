@@ -150,10 +150,41 @@ class Stats:
         self.dict[(hw_type, unit_type, err_type)] += 1
 
     def print(self):
-        print(f"{'hw_type':23} {'unit_type':23} {'err_type':23} {'count':23}")
+        print(f" {'unit_type':23} {'err_type':23} {'count':23}")
         print("-" * 92)
-        for (hw_type, unit_type, err_type), count in sorted(self.dict.items()):
-            print(f"{hw_type:23} {unit_type:23} {err_type:23} {count}")
+        for (_, unit_type, err_type), count in sorted(self.dict.items()):
+            print(f"{unit_type:23} {err_type:23} {count}")
+
+    def print_table(self, app_name: str, prefix: str):
+        # format:
+        # 99/100 99% (alu) 99/100 99% (FP) 99/100 99% (Vector) 99/100 99% (Cache)
+        sdc_count = dict()
+        sdc_validated_count = dict()
+        for (hw_type, unit_type, err_type), count in self.dict.items():
+            if err_type == ErrorType.SDC_DETECTED.value:
+                sdc_count.setdefault(unit_type, 0)
+                sdc_count[unit_type] += count
+                sdc_validated_count.setdefault(unit_type, 0)
+                sdc_validated_count[unit_type] += count
+            elif err_type == ErrorType.SDC_NOT_DETECTED.value:
+                sdc_count.setdefault(unit_type, 0)
+                sdc_count[unit_type] += count
+        # print(sdc_count)
+        sdc_validated_prop = dict()
+        for unit_type, count in sdc_count.items():
+            sdc_validated_prop[unit_type] = sdc_validated_count[unit_type] / count
+        # round to three decimal places
+        sdc_validated_prop = {k: round(v, 4) for k, v in sdc_validated_prop.items()}
+
+        # print without newline
+        # print(prefix, end="     ")
+        for unit_type, count in sdc_count.items():
+            total_sdc_count_of_unit = count
+            total_validated_sdc_count_of_unit = sdc_validated_count[unit_type]
+
+            # show prop in percentage, print without newline
+            print(f"{total_validated_sdc_count_of_unit}/{total_sdc_count_of_unit} {sdc_validated_prop[unit_type]:.1%} ({unit_type})")
+        print()
 
     def stat_sdc_count(self, app_name: str):
         sdc_count = dict()
@@ -181,12 +212,17 @@ class Stats:
         print("-" * 100)
         return sdc_count
 
-def parse(info_path: str, result_path: str, app_name: str):
-    with open(info_path, encoding="ascii") as file:
+def parse(info_path: str, result_path: str, app_name: str, print_type: str = "table"):
+    with open(info_path, encoding="utf-8") as file:
         info: dict = json.load(file)
-    with open(result_path, encoding="ascii") as file:
+    with open(result_path, encoding="utf-8") as file:
         result: dict = json.load(file)
 
+    
+    if "rbv" in result_path:
+        prefix = "RBV"
+    else:
+        prefix = "Orthrus"
     # print(f"{len(info)} functions")
     inst_count = sum(v["inst_count"] for v in info.values())
     # assert inst_count == len(result)
@@ -213,9 +249,17 @@ def parse(info_path: str, result_path: str, app_name: str):
             
             err_type = get_error_type(injection["result"])
             stats.add(hw_type, unit_type, err_type)
-    stats.print()
 
-    stats.stat_sdc_count(app_name)
+    if print_type == "table":
+        stats.print_table(app_name, prefix)
+    elif print_type == "full":
+        stats.print()
+        stats.stat_sdc_count(app_name)
+    else:
+        assert False
+
+
+
 
 
 
@@ -223,4 +267,11 @@ def parse(info_path: str, result_path: str, app_name: str):
 
 if __name__ == "__main__":
     import sys
-    parse(sys.argv[1], sys.argv[2], sys.argv[3])
+    # set arg4 as optional
+    if len(sys.argv) == 4:
+        parse(sys.argv[1], sys.argv[2], sys.argv[3])
+    elif len(sys.argv) == 5:
+        parse(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
+    else:
+        print("Usage: python show_table2.py <info_path> <result_path> <app_name> [<hw_type>]")
+        sys.exit(1)

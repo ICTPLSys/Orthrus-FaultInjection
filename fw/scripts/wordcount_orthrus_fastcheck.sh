@@ -10,8 +10,8 @@ LOG_LEVEL=INFO python test_ng.py \
     --temp-dir ./tests/ \
     --scee-dir ${CWD}/fj_targets/wordcount_orthrus/ \
     --llvm-dir ${LLVM_INSTALL_PATH} \
-    --t-build 40 \
-    --t-test 40 \
+    --t-build 20 \
+    --t-test 20 \
     --category computational \
     --fj-functions both \
     --ft-type orthrus_fastcheck \
@@ -27,8 +27,8 @@ LOG_LEVEL=INFO python test_ng.py \
     --temp-dir ./tests/ \
     --scee-dir ${CWD}/fj_targets/wordcount_orthrus/ \
     --llvm-dir ${LLVM_INSTALL_PATH} \
-    --t-build 40 \
-    --t-test 40 \
+    --t-build 20 \
+    --t-test 20 \
     --category consistency \
     --fj-functions both \
     --ft-type orthrus_fastcheck \

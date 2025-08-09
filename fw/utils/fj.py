@@ -55,10 +55,10 @@ TEST_DEFS: Dict[str, TestDef] = {
         "fj_types": ALL_FJ_TYPES,
         "build": {
             "script": "build.hashmap_rbv.sh",
-            "binary": "./build/tests/hashmap/faultinjection/hashmap_fj_rbv",
+            "binary": "./build/ae/memcached/memcached_rbv_fj",
         },
         "run": {
-            "cmd": ["./hashmap_fj_rbv"],
+            "cmd": ["./memcached_rbv_fj"],
         },
     }),
     "map": TestDef(**{
@@ -148,7 +148,7 @@ TEST_DEFS: Dict[str, TestDef] = {
             "binary": "build/benchmarks/word_count/wc",
         },
         "run": {
-            "cmd": ["./wc", "-i", "/home/xiayanwen/scee/wordcount/benchmarks/word_count/example.txt"],
+            "cmd": ["./wc", "-i", "/home/xiayanwen/data/example.txt"],
         },
     }),
     "wordcount_rbv": TestDef(**{
@@ -158,7 +158,7 @@ TEST_DEFS: Dict[str, TestDef] = {
             "binary": "./build/ae/phoenix/faultinjection/phoenix_rbv_fj",
         },
         "run": {
-            "cmd": ["./phoenix_rbv_fj", "-i", "/home/xiayanwen/scee/wordcount/benchmarks/word_count/example.txt"],
+            "cmd": ["./phoenix_rbv_fj", "-i", "/home/xiayanwen/data/example.txt"],
         },
     }),
     "lsmtree": TestDef(**{

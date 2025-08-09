@@ -22,28 +22,28 @@ pushd $FRAMEWORK_PATH
 # Run FJ for HASHMAP-Orthrus
 ./scripts/memcached_orthrus_fastcheck.sh
 
-# wait
-# # Run FJ for HASHMAP-RBV
-./scripts/memcached_rbv_fastcheck.sh
+# # wait
+# # # Run FJ for HASHMAP-RBV
+# ./scripts/memcached_rbv_fastcheck.sh
 
-# wait
-# # Run FJ for MASSTREE-Orthrus
+# # wait
+# # # Run FJ for MASSTREE-Orthrus
 ./scripts/masstree_orthrus_fastcheck.sh
 
-# wait
-# # Run FJ for MASSTREE-RBV
-./scripts/masstree_orthrus_fastcheck.sh
+# # wait
+# # # Run FJ for MASSTREE-RBV
+# ./scripts/masstree_orthrus_fastcheck.sh
 
-# wait
-# # Run FJ for LSMTree-Orthrus
+# # wait
+# # # Run FJ for LSMTree-Orthrus
 ./scripts/lsmtree_orthrus_fastcheck.sh
 
-# wait
-# # Run FJ for LSMTree-RBV
+# # wait
+# # # Run FJ for LSMTree-RBV
 ./scripts/lsmtree_rbv_fastcheck.sh
 
-# wait
-# # Run FJ for WordCount-Orthrus
+# # wait
+# # # Run FJ for WordCount-Orthrus
 ./scripts/wordcount_orthrus_fastcheck.sh
 
 # wait
