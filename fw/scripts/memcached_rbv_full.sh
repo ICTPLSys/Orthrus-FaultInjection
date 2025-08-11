@@ -1,60 +1,37 @@
 #! /bin/bash
 
+rm -rf tests/hashmap_comp_rbv_full/
+rm -rf tests/hashmap_cons_rbv_full/
+
 LOG_LEVEL=INFO python test_ng.py \
-    --tag hashmap_comp_orthrus_test \
+    --tag hashmap_comp_rbv_full \
     --debug \
-    --test-type hashmap \
+    --test-type hashmap_rbv \
     --temp-dir ./tests/ \
-    --scee-dir /home/xiayanwen/scee/orth/ \
-    --llvm-dir ~/.local/dev/llvm16/ \
+    --scee-dir ${CWD}/fj_targets/memcached_rbv/ \
+    --llvm-dir ${LLVM_INSTALL_PATH} \
     --t-build 40 \
     --t-test 40 \
     --category computational \
-    --fj-functions both \
-    --ft-type orthrus \
-    --output output/hashmap_comp_orthrus_test.json > logs/hashmap_comp_orthrus_test.log 2>&1
+    --fj-functions onlyapp \
+    --ft-type rbv_full \
+    --output output/hashmap_comp_rbv_full.json > logs/hashmap_comp_rbv_full.log 2>&1
 
-    
-# LOG_LEVEL=INFO python test_ng.py \
-#     --tag hashmap_comp_orthrus \
-#     --debug \
-#     --test-type hashmap \
-#     --temp-dir ./tests/ \
-#     --scee-dir /home/xiayanwen/scee/orth/ \
-#     --llvm-dir ~/.local/dev/llvm16/ \
-#     --t-build 40 \
-#     --t-test 40 \
-#     --category computational \
-#     --fj-functions both \
-#     --ft-type orthrus \
-#     --output output/hashmap_comp_orthrus.json > logs/hashmap_comp_orthrus.log 2>&1
+wait
 
-# wait
+LOG_LEVEL=INFO python test_ng.py \
+    --tag hashmap_cons_rbv_full \
+    --debug \
+    --test-type hashmap_rbv \
+    --temp-dir ./tests/ \
+    --scee-dir ${CWD}/fj_targets/memcached_rbv/ \
+    --llvm-dir ${LLVM_INSTALL_PATH} \
+    --t-build 40 \
+    --t-test 40 \
+    --category consistency \
+    --fj-functions onlyapp \
+    --ft-type rbv_full \
+    --output output/hashmap_cons_rbv_full.json > logs/hashmap_cons_rbv_full.log 2>&1
 
-# echo "second start"
-
-# LOG_LEVEL=INFO python test_ng.py \
-#     --tag hashmap_cons_orthrus \
-#     --debug \
-#     --test-type hashmap \
-#     --temp-dir ./tests/ \
-#     --scee-dir /home/xiayanwen/scee/orth/ \
-#     --llvm-dir ~/.local/dev/llvm16/ \
-#     --t-build 40 \
-#     --t-test 40 \
-#     --category consistency \
-#     --fj-functions onlyapp \
-#     --ft-type orthrus \
-#     --output output/hashmap_cons_orthrus.json > logs/hashmap_cons_orthrus.log 2>&1
-
-# LOG_LEVEL=INFO python test_ng.py \
-#     --tag hashmap_all_cons \
-#     --debug \
-#     --test-type hashmap \
-#     --temp-dir ./tests/ \
-#     --scee-dir /home/xiayanwen/scee/orth/ \
-#     --llvm-dir ~/.local/dev/llvm16/ \
-#     --t-build 20 \
-#     --t-test 20 \
-#     --category consistency \
-#     --output output_hashmap_all_consistency.json > hashmap_all_consistency.log 2>&1
+python3 parse.py tests/hashmap_comp_rbv_full/cache/func_fj_infos.json  output/hashmap_comp_rbv_full.json hashmap_rbv_computational
+python3 parse.py tests/hashmap_cons_rbv_full/cache/func_fj_infos.json  output/hashmap_cons_rbv_full.json hashmap_rbv_consistency

@@ -129,6 +129,27 @@ class Config:
             "fpu": 0,
         }
 
+        if self.TAG == "lsmtree_comp_orthrus_full":
+            self.each_fault_bias_count = {
+                "fpu": 8,
+                "alu": 0,
+                "simd": 7
+            }
+        elif self.TAG == "lsmtree_comp_rbv_full":
+            self.each_fault_bias_count = {
+                "fpu": 2,
+                "alu": 0,
+                "simd": 5
+            }
+        else:
+            self.each_fault_bias_count = {
+                "fpu": 1,
+                "alu": 0,
+                "simd": 1,
+                "cc": 1
+            }
+        return
+
         return
 
     def __get_temp__(self, tag: str) -> Path:
@@ -304,6 +325,7 @@ class Config:
             else:
                 try:
                     # if 99% of the tasks have finished, then exit
+                    start_time = time.time()
                     with Pool(self.parallel_test) as pool:
                         with tqdm(
                         total=len(pc_infos), 
@@ -315,7 +337,7 @@ class Config:
                         ) as pbar:
                             for _ in pool.imap_unordered(self.single_pc_profile_only, pc_infos):
                                 pbar.update(1)
-                                if pbar.n > 0.995 * pbar.total:
+                                if time.time() - start_time > 60 * 60 * 4:
                                     break
                 except KeyboardInterrupt:
                     logger.warning("Process interrupted by user.")
@@ -323,6 +345,7 @@ class Config:
                 
                 self.stat_fault_type_by_unit()
 
+                start_time2 = time.time()
                 try:
                     with Pool(self.parallel_test) as pool:
                         with tqdm(
@@ -335,7 +358,7 @@ class Config:
                         ) as pbar:
                             for _ in pool.imap_unordered(self.single_pc_injection_only, pc_infos):
                                 pbar.update(1)
-                                if pbar.n > 0.99 * pbar.total:
+                                if time.time() - start_time2 > 60 * 60 * 6:
                                     break
                 except KeyboardInterrupt:
                     logger.warning("Process interrupted by user.")
@@ -380,8 +403,8 @@ class Config:
                 max_count = max(max_count, (int)(count / self.predefined_ratio[fault_type]))
                 max_count_single = max(max_count_single, (int)(count))
 
-            for fault_type, count in self.fault_info_by_unit_type.items():
-                self.each_fault_bias_count[fault_type] = (int)(max_count * self.predefined_ratio[fault_type] / count * 5)
+            # for fault_type, count in self.fault_info_by_unit_type.items():
+            #     self.each_fault_bias_count[fault_type] = (int)(max_count * self.predefined_ratio[fault_type] / count / 5)
 
             logger.info(f"stat max_count: {max_count}")
             logger.info(f"each_fault_bias_count: {self.each_fault_bias_count}")
@@ -401,7 +424,7 @@ class Config:
             with open(log_path, "r") as f:
                 max_count_single = int(f.read())
             for fault_type, count in self.fault_info_by_unit_type.items():
-                self.each_fault_bias_count[fault_type] = (int)(max_count_single / count) * 10
+                self.each_fault_bias_count[fault_type] = 1
             logger.info(f"each_fault_bias_count: {self.each_fault_bias_count}")
         return
 
@@ -495,6 +518,10 @@ class Config:
             logger.info(f"Testcase({uid}): can not generate fault here, Ignoring")
             return
         
+        # if (fault_info_by_unit.fault_type_by_unit != "simd"):
+        #     logger.info(f"Debuging, only use fpu fault type")
+        #     return
+
         # strstr = "[FaultInfo]: fpu calc ADDSDrr"
         logger.debug(f"fault_info_by_unit: {fault_info_by_unit}")
         # parse the build output to get injection type.
@@ -557,11 +584,14 @@ class Config:
                 if self.test_mode == "lite":
                     break
 
-            # for the rest, we do as a random bitflip
+            # for the rest, we do as a random bitflip or a nop
             for ii in range((int)(self.each_fault_bias_count[fault_info_by_unit.fault_type_by_unit] - processed_count)):
                 if self.test_mode == "lite":
                     break
-                fj_type = FJType.bitflip_random
+                if ii % 2 == 0:
+                    fj_type = FJType.bitflip_random
+                else:
+                    fj_type = FJType.nop
                 tag = f"injection|{fn_name}|{pc}|{fj_type}|{ii}|{fault_info_by_unit.fault_type_by_unit}|{fault_info_by_unit.fault_type_by_instr}"
                 lock, build_dir = self.__get_build__()
                 testcase = TestCase(

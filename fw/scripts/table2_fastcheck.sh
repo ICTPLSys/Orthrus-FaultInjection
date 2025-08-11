@@ -17,40 +17,61 @@ source table2_env.sh
 ###### START ######
 
 # cd framework path
+echo "TABLE2 FAST CHECK"
+
 pushd $FRAMEWORK_PATH
 
+echo "--------------------------------"
+echo "Application: Memcached"
 # Run FJ for HASHMAP-Orthrus
+echo "Orthrus"
 ./scripts/memcached_orthrus_fastcheck.sh
 
-# # wait
+wait
 # # # Run FJ for HASHMAP-RBV
-# ./scripts/memcached_rbv_fastcheck.sh
+echo "RBV"
+./scripts/memcached_rbv_fastcheck.sh
 
-# # wait
+echo "--------------------------------"
+wait
 # # # Run FJ for MASSTREE-Orthrus
+echo "Application: Masstree"
+echo "Orthrus"
 ./scripts/masstree_orthrus_fastcheck.sh
 
-# # wait
+wait
 # # # Run FJ for MASSTREE-RBV
-# ./scripts/masstree_orthrus_fastcheck.sh
+echo "RBV"
+./scripts/masstree_rbv_fastcheck.sh
 
-# # wait
+echo "--------------------------------"
+wait
 # # # Run FJ for LSMTree-Orthrus
+echo "Application: LSMTree"
+echo "Orthrus"
 ./scripts/lsmtree_orthrus_fastcheck.sh
 
-# # wait
+echo "--------------------------------"
+wait
 # # # Run FJ for LSMTree-RBV
+echo "RBV"
 ./scripts/lsmtree_rbv_fastcheck.sh
 
-# # wait
+echo "--------------------------------"
+wait
 # # # Run FJ for WordCount-Orthrus
+echo "Application: WordCount"
+echo "Orthrus"
 ./scripts/wordcount_orthrus_fastcheck.sh
 
-# wait
+echo "--------------------------------"
+wait
 # # Run FJ for WordCount-RBV
+echo "RBV"
 ./scripts/wordcount_rbv_fastcheck.sh
 
-# wait
+echo "--------------------------------"
+wait
 popd
 
 ###### END ######

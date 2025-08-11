@@ -139,11 +139,11 @@ struct Data {
     }
 
     void set_crc() {
-        this->crc = calc_crc(this->key, this->value, this->is_delete);
+        this->crc = Data::calc_crc(this->key, this->value, this->is_delete);
     }
 
     bool check_crc(KeyT key, ValueT value, uint64_t is_delete) const {
-        auto crc = calc_crc(key, value, is_delete);
+        auto crc = Data::calc_crc(key, value, is_delete);
         return crc == this->crc;
     }
 };

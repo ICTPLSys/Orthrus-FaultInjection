@@ -27,7 +27,7 @@
 #include "profile-mem.hpp"
 #endif
 
-hashmap_t *hmap_primary;
+appfj_hashmap_t *hmap_primary;
 hashmap_t *hmap_replica;
 
 namespace do_not_inject {
@@ -87,7 +87,7 @@ void prepare_dataset(int test_id) {
     }
     // hmap_addr = ptr_t<hashmap_t>::make_obj(hashmap_t::make(MaxCap));
     // hmap = hmap_backup = ptr_t<hashmap_t>::create(hmap_addr);
-    hmap_primary = hashmap_t::make(MaxCap);
+    hmap_primary = appfj_hashmap_t::make(MaxCap);
     hmap_replica = hashmap_t::make(MaxCap);
     fprintf(stderr, "dataset prepared, test started\n");
 }
@@ -165,7 +165,7 @@ int benchmark_fn() {
                 if (t.opcode < 2) {
                     using HashmapSetType =
                         RetType (*)(hashmap_t *, Key, Val);
-                    auto ret_1 = hashmap_set(hmap_primary, t.key, t.val);
+                    auto ret_1 = appfj_hashmap_set(hmap_primary, t.key, t.val);
                     auto ret_2 = hashmap_set(hmap_replica, t.key, t.val);
                     do_not_inject::ASSERT_EQ_MEMCACHED(ret_1, ret_2);
                     // auto ret = hashmap_set(hmap, t.key, t.val);
@@ -173,11 +173,16 @@ int benchmark_fn() {
                 } else {
                     using HashmapGetType =
                         const Val *(*)(hashmap_t *, Key);
-                    auto ret_1 = hashmap_get(hmap_primary, t.key);
+                    auto ret_1 = appfj_hashmap_get(hmap_primary, t.key);
                     auto ret_2 = hashmap_get(hmap_replica, t.key);
                     // do_not_inject::ASSERT_EQ_MEMCACHED(ret_1, ret_2);
                     if (memcmp(ret_1->ch, ret_2->ch, VAL_LEN) != 0) {
                         std::cerr << "Validation failed: ASSERT_EQ(" << ret_1->ch << ", " << ret_2->ch << ")\n";
+                        abort();
+                    }
+
+                    if (appfj_hashmap_get_crc(ret_1) != hashmap_get_crc(ret_2)) {
+                        std::cerr << "Validation failed: ASSERT_EQ(" << appfj_hashmap_get_crc(ret_1) << ", " << hashmap_get_crc(ret_2) << ")\n";
                         abort();
                     }
 

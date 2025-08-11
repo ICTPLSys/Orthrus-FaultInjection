@@ -87,3 +87,34 @@ struct hashmap_t {
 const Val *hashmap_get(hashmap_t *hmap, Key key);
 RetType hashmap_set(hashmap_t *hmap, Key key, Val val);
 RetType hashmap_del(hashmap_t *hmap, Key key);
+
+// create a namespace contains all the hashmap operations for the fault injection
+
+struct appfj_hashmap_t {
+    struct entry_t {
+        Key key;
+        Val *val_ptr;
+        entry_t *next;
+        entry_t(Key key, Val *val, entry_t *next);
+        void destroy();
+        void setv(Val val);
+        const Val *getv();
+    };
+    size_t capacity;
+    entry_t **buckets;
+    ordered_mutex_t *locks;
+    appfj_hashmap_t() { capacity = 0; }
+    // make: create a hashmap instance in non-versioned memory
+    static appfj_hashmap_t *make(size_t cap);
+    void destroy();
+    const Val *get(const Key &key);
+    RetType set(const Key &key, const Val &val);
+    RetType del(const Key &key);
+};
+
+const Val *appfj_hashmap_get(appfj_hashmap_t *hmap, Key key);
+RetType appfj_hashmap_set(appfj_hashmap_t *hmap, Key key, Val val);
+RetType appfj_hashmap_del(appfj_hashmap_t *hmap, Key key);
+
+uint32_t appfj_hashmap_get_crc(const Val *val);
+uint32_t hashmap_get_crc(const Val *val);

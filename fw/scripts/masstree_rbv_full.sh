@@ -1,33 +1,37 @@
 #! /bin/bash
 
+rm -rf tests/masstree_comp_rbv_full/
+rm -rf tests/masstree_cons_rbv_full/
+
 LOG_LEVEL=INFO python test_ng.py \
-    --tag masstree_comp_orthrus \
+    --tag masstree_comp_rbv_full \
     --debug \
     --test-type masstree \
     --temp-dir ./tests/ \
-    --scee-dir /home/xiayanwen/scee/masstree/ \
-    --llvm-dir ~/.local/dev/llvm16/ \
+    --scee-dir ${CWD}/fj_targets/masstree_rbv/ \
+    --llvm-dir ${LLVM_INSTALL_PATH} \
     --t-build 40 \
     --t-test 40 \
     --category computational \
     --fj-functions both \
-    --ft-type orthrus \
-    --output output/masstree_comp_orthrus.json > logs/masstree_comp_orthrus.log 2>&1
+    --ft-type rbv_full \
+    --output output/masstree_comp_rbv_full.json > logs/masstree_comp_rbv_full.log 2>&1
 
-# wait 
+wait
 
-# echo "second start"
+LOG_LEVEL=INFO python test_ng.py \
+    --tag masstree_cons_rbv_full \
+    --debug \
+    --test-type masstree \
+    --temp-dir ./tests/ \
+    --scee-dir ${CWD}/fj_targets/masstree_rbv/ \
+    --llvm-dir ${LLVM_INSTALL_PATH} \
+    --t-build 40 \
+    --t-test 40 \
+    --category consistency \
+    --fj-functions both \
+    --ft-type rbv_full \
+    --output output/masstree_cons_rbv_full.json > logs/masstree_cons_rbv_full.log 2>&1
 
-# LOG_LEVEL=INFO python test_ng.py \
-#     --tag masstree_cons_orthrus \
-#     --debug \
-#     --test-type masstree \
-#     --temp-dir ./tests/ \
-#     --scee-dir /home/xiayanwen/scee/masstree/ \
-#     --llvm-dir ~/.local/dev/llvm16/ \
-#     --t-build 40 \
-#     --t-test 40 \
-#     --category consistency \
-#     --fj-functions both \
-#     --ft-type orthrus \
-#     --output output/masstree_cons_orthrus.json > logs/masstree_cons_orthrus.log 2>&1
+python3 parse.py tests/masstree_comp_rbv_full/cache/func_fj_infos.json  output/masstree_comp_rbv_full.json masstree_rbv_computational
+python3 parse.py tests/masstree_cons_rbv_full/cache/func_fj_infos.json  output/masstree_cons_rbv_full.json masstree_rbv_consistency

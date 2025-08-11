@@ -148,6 +148,12 @@ int main_fn() {
         ASSERT_EQ(ret3, get_as_time_no_fault(value));
     }
 
+    sleep(2);
+
+    std::vector<int64_t> ret_values;
+    std::vector<uint32_t> ret_crc32s;
+    std::vector<double> ret_times;
+
     for (int i = 0; i < keys.size(); i++) {
         auto key = keys[i];
         auto ret = scee::run2<int64_t>(
@@ -155,20 +161,30 @@ int main_fn() {
             validator::lsmtree_get,
             lsmtree, key);
         auto v2 = data[key];
-        ASSERT_EQ_FINAL(ret, v2);
+        ret_values.push_back(ret);
 
         auto ret2 = scee::run2<uint32_t>(
             app::lsmtree_get_as_crc32,
             validator::lsmtree_get_as_crc32,
             lsmtree, key);
-        ASSERT_EQ_FINAL(ret2, kompute_crc32_no_fault(&v2, sizeof(v2)));
+        ret_crc32s.push_back(ret2);
 
         auto ret3 = scee::run2<double>(
             app::lsmtree_get_as_time,
             validator::lsmtree_get_as_time,
             lsmtree, key);
-        ASSERT_EQ_FINAL(ret3, get_as_time_no_fault(v2));
+        ret_times.push_back(ret3);
     }
+
+    sleep(1);
+
+    for (int i = 0; i < ret_values.size(); i++) {
+        ASSERT_EQ(ret_values[i], data[keys[i]]);
+        ASSERT_EQ(ret_crc32s[i], kompute_crc32_no_fault(&values[i], sizeof(values[i])));
+        ASSERT_EQ(ret_times[i], get_as_time_no_fault(values[i]));
+    }
+
+
 
     return 0;
 }

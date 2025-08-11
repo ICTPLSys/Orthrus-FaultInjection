@@ -9,23 +9,33 @@
 namespace NAMESPACE {
 using namespace lsmtree;
 
+__attribute__((noinline)) void sim_mutex2() {
+    volatile int i = 0;
+    i += 1;
+    return;
+}
+
 int lsmtree_set(void *lsm, int64_t k, int64_t v) {
+    sim_mutex2();
     auto *tmp = reinterpret_cast<lsmtree::LSMTree *>(lsm);
     auto ret = (int)tmp->Set(k, v);
     return ret;
 }
 
 int64_t lsmtree_get(void *lsm, int64_t k) {
+    sim_mutex2();
     auto *tmp = reinterpret_cast<lsmtree::LSMTree *>(lsm);
     return tmp->Get(k);
 }
 
 int lsmtree_del(void *lsm, int64_t k) {
+    sim_mutex2();
     auto *tmp = reinterpret_cast<lsmtree::LSMTree *>(lsm);
     return (int)tmp->Del(k);
 }
 
 static __attribute__((target("sse4.2"))) uint32_t kompute_crc32_local(
+
     const void* data, std::size_t length) {
     std::uint32_t crc = ~0U;
     const auto* buffer = static_cast<const unsigned char*>(data);
@@ -107,7 +117,7 @@ LSMTree::LSMTree(const fs::path& sst_dir)
 
 ValueT LSMTree::Get(KeyT key) {
     MYASSERT(mem_table_ != nullptr);
-
+    sim_mutex2();
     const auto *p_tbl = mem_table_->load();
     // const auto *p_tbl = mem_table_;
     if (auto ret = p_tbl->Get(key); ret != -1) {
@@ -137,6 +147,7 @@ ValueT LSMTree::Get(KeyT key) {
 }
 
 Retcode LSMTree::Set(KeyT key, ValueT value) {
+    sim_mutex2();
     const auto *p_tbl = mem_table_->load();
     // auto *p_tbl = mem_table_;
     // if (unlikely(p_tbl->mem_size() > MEMTABLE_MAX_SIZE)) {
@@ -149,6 +160,7 @@ Retcode LSMTree::Set(KeyT key, ValueT value) {
 
 
 Retcode LSMTree::Del(KeyT key) {
+    sim_mutex2();
     const auto *p_tbl = mem_table_->load();
     // auto *p_tbl = mem_table_;
     return p_tbl->Del(key);
@@ -163,6 +175,7 @@ void LSMTree::ImmuMemTblFlush() {
 }
 
 void LSMTree::MemTblSwap() {
+    sim_mutex2();
     const auto* p_tbl = mem_table_->load();
     const auto* p_immu_tbl = immu_mem_table_->load();
     // auto* p_tbl = mem_table_;

@@ -1,33 +1,37 @@
 #! /bin/bash
 
+rm -rf tests/lsmtree_comp_orthrus_full/
+rm -rf tests/lsmtree_cons_orthrus_full/
+
 LOG_LEVEL=INFO python test_ng.py \
-    --tag lsmtree_comp_orthrus \
+    --tag lsmtree_comp_orthrus_full \
     --debug \
     --test-type lsmtree \
     --temp-dir ./tests/ \
-    --scee-dir /home/xiayanwen/scee/newlsm/OrthrusLib-SOSP25 \
-    --llvm-dir ~/.local/dev/llvm16/ \
+    --scee-dir ${CWD}/fj_targets/lsmtree_orthrus/ \
+    --llvm-dir ${LLVM_INSTALL_PATH} \
     --t-build 40 \
     --t-test 40 \
     --category computational \
     --fj-functions both \
-    --ft-type orthrus \
-    --output output/lsmtree_comp_orthrus.json > logs/lsmtree_comp_orthrus.log 2>&1
+    --ft-type orthrus_full \
+    --output output/lsmtree_comp_orthrus_full.json > logs/lsmtree_comp_orthrus_full.log 2>&1
 
-# wait
+wait
 
-# echo "second start"
+LOG_LEVEL=INFO python test_ng.py \
+    --tag lsmtree_cons_orthrus_full \
+    --debug \
+    --test-type lsmtree \
+    --temp-dir ./tests/ \
+    --scee-dir ${CWD}/fj_targets/lsmtree_orthrus/ \
+    --llvm-dir ${LLVM_INSTALL_PATH} \
+    --t-build 40 \
+    --t-test 40 \
+    --category consistency \
+    --fj-functions both \
+    --ft-type orthrus_full \
+    --output output/lsmtree_cons_orthrus_full.json > logs/lsmtree_cons_orthrus_full.log 2>&1
 
-# LOG_LEVEL=INFO python test_ng.py \
-#     --tag lsmtree_cons_orthrus \
-#     --debug \
-#     --test-type lsmtree \
-#     --temp-dir ./tests/ \
-#     --scee-dir /home/xiayanwen/scee/newlsm/OrthrusLib-SOSP25 \
-#     --llvm-dir ~/.local/dev/llvm16/ \
-#     --t-build 40 \
-#     --t-test 40 \
-#     --category consistency \
-#     --fj-functions both \
-#     --ft-type orthrus \
-#     --output output/lsmtree_cons_orthrus.json > logs/lsmtree_cons_orthrus.log 2>&1
+python3 parse.py tests/lsmtree_comp_orthrus_full/cache/func_fj_infos.json  output/lsmtree_comp_orthrus_full.json lsmtree_orthrus_computational
+python3 parse.py tests/lsmtree_cons_orthrus_full/cache/func_fj_infos.json  output/lsmtree_cons_orthrus_full.json lsmtree_orthrus_consistency

@@ -2,7 +2,9 @@ int lsmtree_set(void *lsm, int64_t k, int64_t v);
 int64_t lsmtree_get(void *lsm, int64_t k);
 int lsmtree_del(void *lsm, int64_t k);
 const app::lsmtree::InternalStates& lsmtree_get_internal_states(void* lsm);
-double lsmtree_get_time_info(int64_t v);
+double lsmtree_get_time_info(void* lsm, int64_t k);
+uint64_t lsmtree_get_crc(void* lsm, int64_t k);
+__attribute__((noinline)) void sim_mutex(void* lsm);
 
 // using namespace lsmtree;
 // Retcode lsmtree_set(LSMTree *lsm, KeyT k, ValueT v);

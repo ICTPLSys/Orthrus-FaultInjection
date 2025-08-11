@@ -36,6 +36,7 @@ def init_fj_functions(fj_functions: str):
     if fj_functions == "onlyapp":
         logger.info(f"Using only app functions")
         FJ_FUNCTIONS = [
+            re.compile(r".*appfj.*"),
             re.compile(r".*_ZN3app.*"),
             re.compile(r".*_ZNK3app.*"),
         ]

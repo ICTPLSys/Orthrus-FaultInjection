@@ -18,6 +18,12 @@
 
 namespace NAMESPACE::lsmtree {
 
+__attribute__((noinline)) void sim_mutex() {
+    volatile int i = 0;
+    i += 1;
+    return;
+}
+
 SkipListNode::SkipListNode(KeyT key, ValueT value, int lvl, const SkipListNode* nxt)
     : key(key), level(lvl) {
     data = ptr_t<Data>::create({ key, value, false, });
@@ -64,6 +70,8 @@ void SkipList::updateCache(int level, const SkipListNode* node) const {
 }
 
 ValueT SkipList::Get(KeyT key) const {
+    sim_mutex();
+
     auto level = *level_->load();
     // auto level = *level_;
 
@@ -133,6 +141,7 @@ struct Stats {
 } g_stat;
 
 Retcode SkipList::Set(KeyT key, ValueT value) const {
+    sim_mutex();
     #if (LSMTREE_PROFILE_SKIPLIST_RDTSC)
         uint64_t now = rdtsc();
         uint64_t start_0 = now;
@@ -255,6 +264,7 @@ Retcode SkipList::Set(KeyT key, ValueT value) const {
 }
 
 Retcode SkipList::Del(KeyT key) const {
+    sim_mutex();
     int const level = *level_->load();
     const SkipListNode* p = head_;
 

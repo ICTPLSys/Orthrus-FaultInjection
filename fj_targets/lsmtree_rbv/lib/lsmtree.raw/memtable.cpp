@@ -17,6 +17,12 @@
 #include "consts.hpp"
 
 namespace NAMESPACE::lsmtree {
+__attribute__((noinline)) void sim_mutex3() {
+    volatile int i = 0;
+    i += 1;
+    return;
+}
+
 
 SkipListNode::SkipListNode(KeyT key, ValueT value, int lvl, SkipListNode* nxt)
     : key(key), level(lvl) {
@@ -42,6 +48,7 @@ SkipList::SkipList() : gen(114514) {
 
 
 ValueT SkipList::Get(KeyT key) {
+    sim_mutex3();
     auto level = level_;
     auto* p = head_;
     auto* p_data = p->data;
@@ -108,6 +115,7 @@ struct Stats {
 } g_stat;
 
 Retcode SkipList::Set(KeyT key, ValueT value) {
+    sim_mutex3();
     // reset internal state cache
     this->internal_state = InternalStates();
 
