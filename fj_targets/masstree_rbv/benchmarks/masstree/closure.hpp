@@ -61,3 +61,4 @@ scee::ptr_t<Node> *build_tree();
 uint8_t insert(scee::ptr_t<Node> *root, uint64_t key, Value val);
 const Value *update(scee::ptr_t<Node> *root, uint64_t key, Value val);
 const Value *read(scee::ptr_t<Node> *root, uint64_t key);
+__attribute__((noinline)) __attribute__((target("sse4.2"))) uint32_t kompute_crc(const void* data, std::size_t length);

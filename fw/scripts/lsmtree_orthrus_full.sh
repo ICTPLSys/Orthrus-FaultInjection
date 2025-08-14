@@ -1,9 +1,11 @@
 #! /bin/bash
 
+source table2_env_runtime.sh
+
 rm -rf tests/lsmtree_comp_orthrus_full/
 rm -rf tests/lsmtree_cons_orthrus_full/
 
-LOG_LEVEL=INFO python test_ng.py \
+run_with_timeout 28800 LOG_LEVEL=INFO python test_ng.py \
     --tag lsmtree_comp_orthrus_full \
     --debug \
     --test-type lsmtree \
@@ -19,7 +21,7 @@ LOG_LEVEL=INFO python test_ng.py \
 
 wait
 
-LOG_LEVEL=INFO python test_ng.py \
+run_with_timeout 28800 LOG_LEVEL=INFO python test_ng.py \
     --tag lsmtree_cons_orthrus_full \
     --debug \
     --test-type lsmtree \

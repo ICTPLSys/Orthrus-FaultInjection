@@ -3,7 +3,9 @@
 rm -rf tests/masstree_comp_orthrus_full/
 rm -rf tests/masstree_cons_orthrus_full/
 
-LOG_LEVEL=INFO python test_ng.py \
+source table2_env_runtime.sh
+
+run_with_timeout 28800 LOG_LEVEL=INFO python test_ng.py \
     --tag masstree_comp_orthrus_full \
     --debug \
     --test-type masstree \
@@ -19,7 +21,7 @@ LOG_LEVEL=INFO python test_ng.py \
 
 wait
 
-LOG_LEVEL=INFO python test_ng.py \
+run_with_timeout 28800 LOG_LEVEL=INFO python test_ng.py \
     --tag masstree_cons_orthrus_full \
     --debug \
     --test-type masstree \

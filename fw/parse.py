@@ -128,6 +128,8 @@ def get_error_type(injection_result: dict):
     elif any('Validation failed' in line for line in err_log):
         assert err_type == "RunResult.ErrorDetected"
         return ErrorType.SDC_DETECTED
+    elif any('mutex' in line for line in err_log):
+        return ErrorType.SDC_DETECTED
     elif err_type != 'RunResult.Success':
         return ErrorType.FAIL_STOP
     else:

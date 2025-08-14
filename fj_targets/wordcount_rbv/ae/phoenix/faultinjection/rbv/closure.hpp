@@ -20,3 +20,6 @@ double calc_average_length(scee::imm_array<kv_pair> final_results, size_t final_
 double calc_average_frequency(scee::imm_array<kv_pair> final_results, size_t final_result_size);
 
 double calc_standard_deviation(scee::imm_array<kv_pair> final_results, size_t final_result_size);
+
+__attribute__((target("sse4.2"))) uint32_t calculate_value(const void* data,
+    std::size_t length);

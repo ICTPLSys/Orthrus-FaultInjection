@@ -198,7 +198,7 @@ TEST_DEFS: Dict[str, TestDef] = {
             "binary": "build/benchmarks/masstree/masstree_faultinject",
         },
         "run": {
-            "cmd": ["./masstree_fj_rbv"],
+            "cmd": ["./masstree_faultinject"],
         },
     }),
 }

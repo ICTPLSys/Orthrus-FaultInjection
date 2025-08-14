@@ -6,6 +6,11 @@
 #include <cstring>
 #include <immintrin.h>
 
+__attribute__((noinline)) void sim_mutex(){
+    volatile int x = 0;
+    x++;
+}
+
 hashmap_t::entry_t::entry_t(Key key, Val *val, entry_t *next)
     : key(key), val_ptr(val), next(next) {}
 
@@ -73,6 +78,7 @@ void hashmap_t::destroy() {
 
 const Val *hashmap_t::get(const Key &key) {
     uint32_t hv = key.hash() % capacity;
+    sim_mutex();
     ordered_guard_t guard(&locks[hv]);
     entry_t *bucket = buckets[hv];
     while (bucket != nullptr) {
@@ -88,6 +94,7 @@ const Val *hashmap_t::get(const Key &key) {
 
 RetType hashmap_t::set(const Key &key, const Val &val) {
     uint32_t hv = key.hash() % capacity;
+    sim_mutex();
     ordered_guard_t guard(&locks[hv]);
     entry_t *bucket = buckets[hv];
     while (bucket != nullptr) {
@@ -114,6 +121,7 @@ RetType hashmap_t::set(const Key &key, const Val &val) {
 
 RetType hashmap_t::del(const Key &key) {
     uint32_t hv = key.hash() % capacity;
+    sim_mutex();
     ordered_guard_t guard(&locks[hv]);
     entry_t **bucket = &buckets[hv];
     while (*bucket != nullptr) {
@@ -149,13 +157,16 @@ void appfj_hashmap_t::entry_t::destroy() {
 }
 
 void appfj_hashmap_t::entry_t::setv(Val val) {
+    sim_mutex();
     Val *new_val = (Val *)malloc(sizeof(Val));
     memcpy(new_val, &val, sizeof(Val));
     free(val_ptr);
     val_ptr = new_val;
 }
 
-const Val *appfj_hashmap_t::entry_t::getv() { return val_ptr; }
+const Val *appfj_hashmap_t::entry_t::getv() { 
+    sim_mutex();
+    return val_ptr; }
 
 appfj_hashmap_t *appfj_hashmap_t::make(size_t capacity) {
     appfj_hashmap_t *hm = (appfj_hashmap_t *)malloc(sizeof(appfj_hashmap_t));
@@ -194,6 +205,7 @@ void appfj_hashmap_t::destroy() {
 
 const Val *appfj_hashmap_t::get(const Key &key) {
     uint32_t hv = key.hash() % capacity;
+    sim_mutex();
     ordered_guard_t guard(&locks[hv]);
     entry_t *bucket = buckets[hv];
     while (bucket != nullptr) {
@@ -209,6 +221,7 @@ const Val *appfj_hashmap_t::get(const Key &key) {
 
 RetType appfj_hashmap_t::set(const Key &key, const Val &val) {
     uint32_t hv = key.hash() % capacity;
+    sim_mutex();
     ordered_guard_t guard(&locks[hv]);
     entry_t *bucket = buckets[hv];
     while (bucket != nullptr) {
@@ -234,6 +247,7 @@ RetType appfj_hashmap_t::set(const Key &key, const Val &val) {
 }
 
 RetType appfj_hashmap_t::del(const Key &key) {
+    sim_mutex();
     uint32_t hv = key.hash() % capacity;
     ordered_guard_t guard(&locks[hv]);
     entry_t **bucket = &buckets[hv];
@@ -251,9 +265,12 @@ RetType appfj_hashmap_t::del(const Key &key) {
     return kNotFound;
 }
 
-const Val *appfj_hashmap_get(appfj_hashmap_t *hmap, Key key) { return hmap->get(key); }
+const Val *appfj_hashmap_get(appfj_hashmap_t *hmap, Key key) { 
+    sim_mutex();
+    return hmap->get(key); }
 
 RetType appfj_hashmap_set(appfj_hashmap_t *hmap, Key key, Val val) {
+    sim_mutex();
     return hmap->set(key, val);
 }
 

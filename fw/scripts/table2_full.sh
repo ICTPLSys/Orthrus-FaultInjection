@@ -12,39 +12,73 @@
 #   - {FRAMEWORK_PATH}/output/ result file for each line
 #   - {FRAMEWORK_PATH}/tests/ testcases, intermediate files
 
-HOME_PATH=
-FRAMEWORK_PATH=
-LLVM_PATH=
-
+source table2_env.sh
 
 ###### START ######
+
+echo "TABLE2 FULL"
+echo "Estimated runtime: 50 hours"
+echo "Warning: Recommended to run the commands in this script sequentially manually"
 
 # cd framework path
 pushd $FRAMEWORK_PATH
 
 # Run FJ for HASHMAP-Orthrus
-./scripts/fj_hashmap_orthrus.sh
+echo "--------------------------------"
+echo "Application: Memcached"
+# Run FJ for HASHMAP-Orthrus
+echo "Orthrus"
+./scripts/memcached_orthrus_full.sh
 
+wait
 # Run FJ for HASHMAP-RBV
-./scripts/fj_hashmap_rbv.sh
+echo "RBV"
+./scripts/memcached_rbv_full.sh
 
-# Run FJ for MASSTREE-Orthrus
-./scripts/fj_masstree_orthrus.sh
+wait
 
-# Run FJ for MASSTREE-RBV
-./scripts/fj_masstree_rbv.sh
+echo "--------------------------------"
+# # Run FJ for MASSTREE-Orthrus
+echo "Application: Masstree"
+echo "Orthrus"
+./scripts/masstree_orthrus_full.sh
 
-# Run FJ for LSMTree-Orthrus
-./scripts/fj_lsmtree_orthrus.sh
+wait
+
+# # Run FJ for MASSTREE-RBV
+echo "RBV"
+./scripts/masstree_rbv_full.sh
+
+wait
+
+echo "--------------------------------"
+# # Run FJ for LSMTree-Orthrus
+echo "Application: LSMTree"
+echo "Orthrus"
+./scripts/lsmtree_orthrus_full.sh
+
+wait
 
 # Run FJ for LSMTree-RBV
-./scripts/fj_lsmtree_rbv.sh
+echo "RBV"
+./scripts/lsmtree_rbv_full.sh
 
-# Run FJ for WordCount-Orthrus
-./scripts/fj_wordcount_orthrus.sh
+wait
 
-# Run FJ for WordCount-RBV
-./scripts/fj_wordcount_rbv.sh
+echo "--------------------------------"
+# # Run FJ for WordCount-Orthrus
+echo "Application: WordCount"
+echo "Orthrus"
+./scripts/wordcount_orthrus_full.sh
+
+wait
+
+# # Run FJ for WordCount-RBV
+echo "RBV"
+./scripts/wordcount_rbv_full.sh
+
+wait
+
 
 popd
 

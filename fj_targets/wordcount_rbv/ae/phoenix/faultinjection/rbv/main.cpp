@@ -1,5 +1,6 @@
 #include <boost/program_options.hpp>
 #include <chrono>
+#include <cstdint>
 #include <cstdio>
 #include <iomanip>
 #include <iostream>
@@ -111,6 +112,7 @@ struct Results {
     double average_length;
     double average_frequency;
     double standard_deviation;
+    uint32_t val_crc;
 
     // final results
     int final_result_size;
@@ -160,6 +162,7 @@ struct Results {
         ASSERT_EQ(ret1.average_length, ret2.average_length);
         ASSERT_EQ(ret1.average_frequency, ret2.average_frequency);
         ASSERT_EQ(ret1.standard_deviation, ret2.standard_deviation);
+        ASSERT_EQ(ret1.val_crc, ret2.val_crc);
 
         // RBV Final Check
         ASSERT_EQ_FINAL(ret1.final_result_size, ret2.final_result_size);
@@ -281,16 +284,17 @@ auto main_fn(const char *buffer, size_t file_size, map_reduce_config config) {
 #ifdef PROFILE_MEM
     profile::mem::stop();
 #endif
-    auto wf = app::calc_each_word_frequency(final_results, final_result_size);
+    auto wf = __scee_run(calc_each_word_frequency, final_results, final_result_size);
     printf("wf: %f\n", wf);
 
-    auto average_length = app::calc_average_length(final_results, final_result_size);
+    auto average_length = __scee_run(calc_average_length, final_results, final_result_size);
     printf("average length: %f\n", average_length);
 
-    auto average_frequency = app::calc_average_frequency(final_results, final_result_size);
+
+    auto average_frequency = __scee_run(calc_average_frequency, final_results, final_result_size);
     printf("average frequency: %f\n", average_frequency);
 
-    auto standard_deviation = app::calc_standard_deviation(final_results, final_result_size);
+    auto standard_deviation = __scee_run(calc_standard_deviation, final_results, final_result_size);
     printf("standard deviation: %f\n", standard_deviation);
 
     ret->wf = wf;
@@ -298,6 +302,9 @@ auto main_fn(const char *buffer, size_t file_size, map_reduce_config config) {
     ret->average_frequency = average_frequency;
     ret->standard_deviation = standard_deviation;
 
+    auto val_crc = __scee_run(calculate_value, &average_frequency, sizeof(double));
+    printf("val_crc: %u\n", val_crc);
+    ret->val_crc = val_crc;
 
     // return 0;
     ret->ret = 0;

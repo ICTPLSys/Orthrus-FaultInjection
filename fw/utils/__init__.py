@@ -137,16 +137,77 @@ class Config:
             }
         elif self.TAG == "lsmtree_comp_rbv_full":
             self.each_fault_bias_count = {
+                "fpu": 18,
+                "alu": 5,
+                "simd": 40
+            }
+        elif self.TAG == "lsmtree_cons_orthrus_full":
+            self.each_fault_bias_count = {
+                "cc": 8
+            }
+        elif self.TAG == "lsmtree_cons_rbv_full":
+            self.each_fault_bias_count = {
+                "cc": 12
+            }
+        elif self.TAG == "hashmap_cons_orthrus_full":
+            self.each_fault_bias_count = {
                 "fpu": 2,
                 "alu": 0,
-                "simd": 5
+                "simd": 5,
+                "cc": 8
             }
-        else:
+        elif self.TAG == "masstree_comp_orthrus_full":
             self.each_fault_bias_count = {
                 "fpu": 1,
                 "alu": 0,
-                "simd": 1,
-                "cc": 1
+                "simd": 12
+            }
+        elif self.TAG == "masstree_cons_orthrus_full":
+            self.each_fault_bias_count = {
+                "cc": 2
+            }
+        elif self.TAG == "masstree_comp_rbv_full":
+            self.each_fault_bias_count = {
+                "fpu": 1,
+                "alu": 1,
+                "simd": 15
+            }
+        elif self.TAG == "masstree_cons_rbv_full":
+            self.each_fault_bias_count = {
+                "cc": 3
+            }
+        elif self.TAG == "hashmap_comp_rbv_full":
+            self.each_fault_bias_count = {
+                "fpu": 1,
+                "alu": 5,
+                "simd": 12
+            }
+        elif self.TAG == "hashmap_cons_rbv_full":
+            self.each_fault_bias_count = {
+                "cc": 20
+            }
+        elif self.TAG == "hashmap_cons_rbv_full":
+            self.each_fault_bias_count = {
+                "cc": 20
+            }
+        elif self.TAG == "wc_comp_orthrus_full":
+            self.each_fault_bias_count = {
+                "fpu": 6,
+                "alu": 0,
+                "simd": 18
+            }
+        elif self.TAG == "wc_comp_rbv_full":
+            self.each_fault_bias_count = {
+                "fpu": 4,
+                "alu": 1,
+                "simd": 180
+            }
+        else:
+            self.each_fault_bias_count = {
+                "fpu": 2,
+                "alu": 0,
+                "simd": 5,
+                "cc": 8
             }
         return
 
@@ -277,6 +338,7 @@ class Config:
         # with Pool(self.parallel_test) as pool:
         #     pool.map(self.single_pc_profile_and_inject, pc_infos)
 
+        # if requested, 
         signal.signal(signal.SIGINT, signal_handler)
         # profile and inject in parallel
         if separate_profile:
@@ -418,13 +480,13 @@ class Config:
                 f.write(str(max_count_single))
         else:
             # read the max_count_single from a file
-            home_dir = os.getenv("HOME")
-            log_path = f"{home_dir}/scee/fw/logs/{self.app_name}_{self.ft_type}_max_count_single.txt"
-            max_count_single = 0
-            with open(log_path, "r") as f:
-                max_count_single = int(f.read())
-            for fault_type, count in self.fault_info_by_unit_type.items():
-                self.each_fault_bias_count[fault_type] = 1
+            # home_dir = os.getenv("HOME")
+            # log_path = f"{home_dir}/scee/fw/logs/{self.app_name}_{self.ft_type}_max_count_single.txt"
+            # max_count_single = 0
+            # with open(log_path, "r") as f:
+            #     max_count_single = int(f.read())
+            # for fault_type, count in self.fault_info_by_unit_type.items():
+            #     self.each_fault_bias_count[fault_type] = 1
             logger.info(f"each_fault_bias_count: {self.each_fault_bias_count}")
         return
 

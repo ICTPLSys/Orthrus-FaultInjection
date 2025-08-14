@@ -40,8 +40,8 @@ void ASSERT_EQ_MEMCACHED(const T& val1, const T& val2) {
     }
 }
 // if any assert fails, there is an undetected SDC
-constexpr int VV = 16;
-constexpr int NThreads = 1;
+constexpr int VV = 18;
+constexpr int NThreads = 16;
 constexpr int MaxCap = 1 << VV, NKeys = 1 << VV, NUpdates = 2 << VV,
               NGets = 2 << VV;
 constexpr int NOps = (NKeys + NUpdates + NGets) / NThreads;

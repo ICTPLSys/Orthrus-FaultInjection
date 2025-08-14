@@ -1,9 +1,10 @@
 #! /bin/bash
 
 rm -rf tests/hashmap_comp_orthrus_full/
-rm -rf tests/hashmap_cons_orthrus_full/
 
-LOG_LEVEL=INFO python test_ng.py \
+source table2_env_runtime.sh
+
+run_with_timeout 28800 LOG_LEVEL=INFO python test_ng.py \
     --tag hashmap_comp_orthrus_full \
     --debug \
     --test-type hashmap \
@@ -19,7 +20,9 @@ LOG_LEVEL=INFO python test_ng.py \
 
 wait
 
-LOG_LEVEL=INFO python test_ng.py \
+rm -rf tests/hashmap_cons_orthrus_full/
+
+run_with_timeout 28800 LOG_LEVEL=INFO python test_ng.py \
     --tag hashmap_cons_orthrus_full \
     --debug \
     --test-type hashmap \

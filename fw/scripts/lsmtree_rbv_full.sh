@@ -3,7 +3,9 @@
 rm -rf tests/lsmtree_comp_rbv_full/
 rm -rf tests/lsmtree_cons_rbv_full/
 
-LOG_LEVEL=INFO python test_ng.py \
+source table2_env_runtime.sh
+
+run_with_timeout 28800 LOG_LEVEL=INFO python test_ng.py \
     --tag lsmtree_comp_rbv_full \
     --debug \
     --test-type lsmtree_rbv \
@@ -19,7 +21,7 @@ LOG_LEVEL=INFO python test_ng.py \
 
 wait
 
-LOG_LEVEL=INFO python test_ng.py \
+run_with_timeout 28800 LOG_LEVEL=INFO python test_ng.py \
     --tag lsmtree_cons_rbv_full \
     --debug \
     --test-type lsmtree_rbv \

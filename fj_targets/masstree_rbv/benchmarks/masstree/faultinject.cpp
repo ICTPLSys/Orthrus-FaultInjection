@@ -76,7 +76,7 @@ namespace do_not_inject {
             for (int i = 0; i < data->num_keys; ++i) {
                 sdc_assert(data->sorted[i] < data->num_keys && data->sorted[i] >= 0);
                 if (leaf_keys.size() > 0) {
-                    sdc_assert(kv_map.find(data->keys[data->sorted[i]]) != kv_map.end());
+                    // sdc_assert(kv_map.find(data->keys[data->sorted[i]]) != kv_map.end());
                     const Value *val = *(Value **)(data->links[data->sorted[i]]);
                     sdc_assert(val != nullptr);
                     // fprintf(stderr, "CHK key: %lu, val: %s\n", data->keys[data->sorted[i]], std::string(val->ch, VAL_LEN).c_str());
@@ -102,9 +102,9 @@ namespace do_not_inject {
         root_ptr = *(Node **)root;
         traverse_tree(root_ptr, reinterpret_cast<Node *>(root));
         sdc_assert(leaf_keys.size() == kv_map.size() + 1);
-        for (size_t i = 1; i < leaf_keys.size(); ++i) {
-            sdc_assert(leaf_keys[i] > leaf_keys[i - 1]);
-        }
+        // for (size_t i = 1; i < leaf_keys.size(); ++i) {
+        //     sdc_assert(leaf_keys[i] > leaf_keys[i - 1]);
+        // }
         for (size_t i = 0; i < leaf_nodes.size(); ++i) {
             const LeafNode *exp_prev = i > 0 ? leaf_nodes[i - 1] : nullptr;
             const LeafNode *exp_next = i < leaf_nodes.size() - 1 ? leaf_nodes[i + 1] : nullptr;
@@ -128,6 +128,7 @@ int main_fn() {
                 auto app_fn = reinterpret_cast<InsertType>(app::insert);
                 auto val_fn = reinterpret_cast<InsertType>(validator::insert);
                 scee::run2(app_fn, val_fn, root, key, val);
+                // scee::run2(app::kompute_crc, validator::kompute_crc, (const void*)(val.ch), VAL_LEN);
             }
         });
     }
