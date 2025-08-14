@@ -3,9 +3,9 @@
 rm -rf tests/wc_comp_orthrus_full/
 rm -rf tests/wc_cons_orthrus_full/
 
-source table2_env_runtime.sh
+source ../table2_env_runtime.sh
 
-run_with_timeout 28800 LOG_LEVEL=INFO python test_ng.py \
+run_with_timeout 28800 bash -c "LOG_LEVEL=INFO python test_ng.py \
     --tag wc_comp_orthrus_full \
     --debug \
     --test-type wordcount \
@@ -17,7 +17,7 @@ run_with_timeout 28800 LOG_LEVEL=INFO python test_ng.py \
     --category computational \
     --fj-functions both \
     --ft-type orthrus_full \
-    --output output/wc_comp_orthrus_full.json > logs/wc_comp_orthrus_full.log 2>&1
+    --output output/wc_comp_orthrus_full.json > logs/wc_comp_orthrus_full.log 2>&1"s
 
 wait
 

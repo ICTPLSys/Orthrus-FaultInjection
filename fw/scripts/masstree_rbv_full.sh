@@ -3,9 +3,12 @@
 rm -rf tests/masstree_comp_rbv_full/
 rm -rf tests/masstree_cons_rbv_full/
 
-source table2_env_runtime.sh
+rm -rf tests/masstree_comp_rbv_full/build/
+rm -rf tests/masstree_cons_rbv_full/build/
 
-run_with_timeout 28800 LOG_LEVEL=INFO python test_ng.py \
+source ../table2_env_runtime.sh
+
+run_with_timeout 28800 bash -c "LOG_LEVEL=INFO python test_ng.py \
     --tag masstree_cons_rbv_full \
     --debug \
     --test-type masstree \
@@ -17,11 +20,11 @@ run_with_timeout 28800 LOG_LEVEL=INFO python test_ng.py \
     --category consistency \
     --fj-functions onlyapp \
     --ft-type rbv_full \
-    --output output/masstree_cons_rbv_full.json > logs/masstree_cons_rbv_full.log 2>&1
+    --output output/masstree_cons_rbv_full.json > logs/masstree_cons_rbv_full.log 2>&1"
 
 wait
 
-run_with_timeout 28800 LOG_LEVEL=INFO python test_ng.py \
+run_with_timeout 28800 bash -c "LOG_LEVEL=INFO python test_ng.py \
     --tag masstree_comp_rbv_full \
     --debug \
     --test-type masstree \
@@ -33,7 +36,7 @@ run_with_timeout 28800 LOG_LEVEL=INFO python test_ng.py \
     --category computational \
     --fj-functions onlyapp \
     --ft-type rbv_full \
-    --output output/masstree_comp_rbv_full.json > logs/masstree_comp_rbv_full.log 2>&1
+    --output output/masstree_comp_rbv_full.json > logs/masstree_comp_rbv_full.log 2>&1"
 
 # wait
 

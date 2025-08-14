@@ -2,10 +2,12 @@
 
 rm -rf tests/wc_comp_rbv_full/
 rm -rf tests/wc_cons_rbv_full/
+rm -rf tests/wc_comp_orthrus_full/build/
+rm -rf tests/wc_cons_orthrus_full/build/
 
-source table2_env_runtime.sh
+source ../table2_env_runtime.sh
 
-run_with_timeout 28800 LOG_LEVEL=INFO python test_ng.py \
+run_with_timeout 28800 bash -c "LOG_LEVEL=INFO python test_ng.py \
     --tag wc_comp_rbv_full \
     --debug \
     --test-type wordcount_rbv \
@@ -17,7 +19,7 @@ run_with_timeout 28800 LOG_LEVEL=INFO python test_ng.py \
     --category computational \
     --fj-functions onlyapp \
     --ft-type rbv_full \
-    --output output/wc_comp_rbv_full.json > logs/wc_comp_rbv_full.log 2>&1
+    --output output/wc_comp_rbv_full.json > logs/wc_comp_rbv_full.log 2>&1"
 
 wait
 
