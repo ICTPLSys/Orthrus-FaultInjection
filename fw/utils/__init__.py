@@ -149,13 +149,6 @@ class Config:
             self.each_fault_bias_count = {
                 "cc": 12
             }
-        elif self.TAG == "hashmap_cons_orthrus_full":
-            self.each_fault_bias_count = {
-                "fpu": 2,
-                "alu": 0,
-                "simd": 5,
-                "cc": 8
-            }
         elif self.TAG == "masstree_comp_orthrus_full":
             self.each_fault_bias_count = {
                 "fpu": 1,
@@ -176,19 +169,25 @@ class Config:
             self.each_fault_bias_count = {
                 "cc": 3
             }
+        elif self.TAG == "hashmap_comp_orthrus_full":
+            self.each_fault_bias_count = {
+                "fpu": 2,
+                "alu": 0,
+                "simd": 18,
+            }
         elif self.TAG == "hashmap_comp_rbv_full":
             self.each_fault_bias_count = {
                 "fpu": 1,
-                "alu": 5,
-                "simd": 12
+                "alu": 7,
+                "simd": 15
+            }
+        elif self.TAG == "hashmap_cons_orthrus_full":
+            self.each_fault_bias_count = {
+                "cc": 2
             }
         elif self.TAG == "hashmap_cons_rbv_full":
             self.each_fault_bias_count = {
-                "cc": 20
-            }
-        elif self.TAG == "hashmap_cons_rbv_full":
-            self.each_fault_bias_count = {
-                "cc": 20
+                "cc": 17
             }
         elif self.TAG == "wc_comp_orthrus_full":
             self.each_fault_bias_count = {

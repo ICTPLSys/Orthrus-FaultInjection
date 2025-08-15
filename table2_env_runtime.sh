@@ -15,11 +15,11 @@ run_with_timeout() {
         elapsed=$((now - start_time))
 
         if [ "$elapsed" -ge "$timeout_seconds" ]; then
-            echo "⏱ 超过 $timeout_seconds 秒，发送 SIGINT 给进程组 $pgid"
+            echo "⏱ over $timeout_seconds seconds, send SIGINT to process group $pgid"
             kill -INT -"${pgid}" 2>/dev/null || true
 
             local waited=0
-            while kill -0 "$pid" 2>/dev/null && [ $waited -lt 5 ]; do
+            while kill -0 "$pid" 2>/dev/null && [ $waited -lt 120 ]; do
                 sleep 1
                 waited=$((waited+1))
             done
