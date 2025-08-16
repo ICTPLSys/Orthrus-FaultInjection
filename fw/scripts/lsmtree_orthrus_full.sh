@@ -1,6 +1,6 @@
 #! /bin/bash
 
-source table2_env_runtime.sh
+source ../table2_env_runtime.sh
 
 rm -rf tests/lsmtree_comp_orthrus_full/
 rm -rf tests/lsmtree_cons_orthrus_full/
