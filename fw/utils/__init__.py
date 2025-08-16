@@ -173,17 +173,17 @@ class Config:
             self.each_fault_bias_count = {
                 "fpu": 2,
                 "alu": 0,
-                "simd": 18,
+                "simd": 24,
             }
         elif self.TAG == "hashmap_comp_rbv_full":
             self.each_fault_bias_count = {
                 "fpu": 1,
-                "alu": 7,
-                "simd": 15
+                "alu": 12,
+                "simd": 18
             }
         elif self.TAG == "hashmap_cons_orthrus_full":
             self.each_fault_bias_count = {
-                "cc": 2
+                "cc": 4
             }
         elif self.TAG == "hashmap_cons_rbv_full":
             self.each_fault_bias_count = {

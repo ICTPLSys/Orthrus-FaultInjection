@@ -12,3 +12,4 @@ Notes:
 
 - The script maintains high CPU utilization throughout its execution.
 - Orthrus and RBV may yield different total SDC counts since Orthrus undergoes additional error injections to demonstrate its effectiveness. Detection rates remain reliable. Also, The SDC errors' count can be more than numbers in Table2, it's normal.
+- The detailed log and output json are under the folders ./fw/logs/ and ./fw/output/

@@ -12,12 +12,15 @@ This script outputs the fault detection rate for each application and fault tole
 
 For example, the initial output lines may appear as follows:
 
-```
+```shell
+Application: Memcached:      
+Orthrus
+99/100 99% (alu)
+100/100 100.0% (simd)
 
-                Arithmetic     FP     Vector   Cache    
-Memcached:      
-RBV:            99/100(99%)   ....     ....     ....
-Orthrus:          ....        ....     ....     ....
+RBV
+...
+# the fault type: alu is Arithmetic, fpu is  Floating point, simd is Vector and cc is Cache.
 
 ```
 
@@ -25,4 +28,5 @@ Notes:
 
 (1) FastCheck produces significantly fewer SDC errors than the full test.
 (2) The distribution of injected error types may not match Table 2 proportions due to the smaller sample size.
-(3)Orthrus and RBV may show differing total SDC counts since additional errors are injected into Orthrus to highlight its efficiency. Detection rates remain reliable.
+(3) Orthrus and RBV may show differing total SDC counts since additional errors are injected into Orthrus to highlight its efficiency. Detection rates remain reliable.
+(4) The detailed log and output json are under the folders ./fw/logs/ and ./fw/output/

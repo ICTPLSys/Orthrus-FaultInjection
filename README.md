@@ -2,6 +2,10 @@
 
 > This is the `fj branch` for fault injection test.
 
+> To set up the environment:
+See [docs/prerequisite.md](docs/table2_fastcheck.md)
+
+
 Details in 
 
 - [docs/table2_fastcheck.md](docs/table2_fastcheck.md)
