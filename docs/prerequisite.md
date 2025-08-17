@@ -9,7 +9,7 @@ Note that you should use cmake version >= 3.20.
 
 ## Environment for Fault Injection Evaluation
 
-If you already set up the env on the machine, you only need to execute the "mkdir " scripts in the setup.sh 
+If you already set up the env on the machine, you only need to execute the "mkdir " and "cp example.txt" commands in the ./fw/scripts/table2_setup.sh. If you do not copy the file, run wordcount fj will fail. 
 
 ```shell
 # !!!! DO NOT RUN IN ROOT USER!!!!
