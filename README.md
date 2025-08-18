@@ -2,6 +2,8 @@
 
 > This is the `fault injection branch` for fault injection test. !!! This branch's README is not same as master branch!!!
 
+Please follow the docs in this branch.
+
 This branch is for **Error Injection Tests** (Table 2):
 
 1. A **complete** error injection test may take about **40 hours**. (table2_full.sh) 

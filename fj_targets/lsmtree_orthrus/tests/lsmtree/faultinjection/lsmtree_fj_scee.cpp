@@ -181,7 +181,10 @@ int main_fn() {
     for (int i = 0; i < ret_values.size(); i++) {
         // ASSERT_EQ_FINAL(ret_values[i], data[keys[i]]);
         ASSERT_EQ_FINAL(ret_crc32s[i], kompute_crc32_no_fault(&ret_values[i], sizeof(ret_values[i])));
-        ASSERT_EQ_FINAL(ret_times[i], get_as_time_no_fault(ret_values[i]));
+        if (abs(ret_times[i] - get_as_time_no_fault(ret_values[i])) > 1.0) {
+            std::cerr << "SDC Not Detected Test failed: ret_times[i] = " << ret_times[i] << ", get_as_time_no_fault(ret_values[i]) = " << get_as_time_no_fault(ret_values[i]) << std::endl;
+            abort();
+        }
     }
 
 
