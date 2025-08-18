@@ -19,7 +19,7 @@ run_with_timeout() {
             kill -INT -"${pgid}" 2>/dev/null || true
 
             local waited=0
-            while kill -0 "$pid" 2>/dev/null && [ $waited -lt 120 ]; do
+            while kill -0 "$pid" 2>/dev/null && [ $waited -lt 1800 ]; do
                 sleep 1
                 waited=$((waited+1))
             done
@@ -29,7 +29,7 @@ run_with_timeout() {
                 kill -TERM -"${pgid}" 2>/dev/null || true
             fi
             local waited2=0
-            while kill -0 "$pid" 2>/dev/null && [ $waited2 -lt 2 ]; do
+            while kill -0 "$pid" 2>/dev/null && [ $waited2 -lt 1800 ]; do
                 sleep 1
                 waited2=$((waited2+1))
             done

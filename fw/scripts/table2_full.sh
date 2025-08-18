@@ -18,7 +18,7 @@ source table2_env.sh
 
 echo "TABLE2 FULL"
 echo "Estimated runtime: 50 hours"
-echo "Warning: Recommended to run the commands in this script sequentially manually"
+echo "Warning: If the scripts failed, we recommend to run the remaining commands in this script sequentially manually"
 
 # cd framework path
 pushd $FRAMEWORK_PATH

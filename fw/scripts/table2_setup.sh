@@ -8,7 +8,7 @@ LLVM_PATH=$CWD/llvm
 
 echo "HOME_PATH: $HOME_PATH"
 
-sudo apt install -y python3-pip libssl-dev lzma libsqlite3-dev
+# sudo apt install -y python3-pip libssl-dev lzma libsqlite3-dev
 
 mkdir -p $HOME_PATH/data
 
@@ -41,6 +41,7 @@ pyenv global 3.11.10
 
 wait 
 
+# install for pyenv's python
 pip install tqdm testresources poetry coloredlogs pydantic
 
 mkdir -p logs

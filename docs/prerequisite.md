@@ -12,7 +12,7 @@ Note that you should use cmake version >= 3.20.
 If you already set up the env on the machine, you only need to execute the "mkdir " and "cp example.txt" commands in the ./fw/scripts/table2_setup.sh. If you do not copy the file, run wordcount fj will fail. 
 
 ```shell
-# !!!! DO NOT RUN IN ROOT USER!!!!
+# !!!! DO NOT RUN IN ROOT!!!!
 ./fw/scripts/table2_setup.sh
 # this shell will install our modified LLVM clang compiler and python testing platform. 
 
