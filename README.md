@@ -1,35 +1,23 @@
-# Orthrus: Efficient and Timely Detection of Silent User Data Corruption in the Cloud with Resource-Adaptive Computation Validation
+# Orthrus FI (Fault Injection) Platform
 
-> This is the `fault injection branch` for fault injection test. !!! This branch's README is not same as master branch!!!
+This Repo is an automated fault-injection test platform for research projects. The method and implementation is first proposed in our SOSP 2025 paper Orthrus.  
 
-Please follow the docs in this branch.
-
-This branch is for **Error Injection Tests** (Table 2):
-
-1. A **complete** error injection test may take about **40 hours**. (table2_full.sh) 
-2. We also provide a **partial** error injection test for a fast check (table2_full.sh), which takes **2 hours** (Note: the results in the paper are based on the full error injection test).
-
-> To set up the environment:
-See [docs/prerequisite.md](docs/prerequisite.md)
-```shell
-# Run in User mode, not in ROOT
-./fw/scripts/table2_setup.sh
+How To cite:
+```tex
+@inproceedings{liu2025orthrus,
+  title={Orthrus: Efficient and Timely Detection of Silent User Data Corruption in the Cloud with Resource-Adaptive Computation Validation},
+  author={Liu, Chenxiao and Zhu, Zhenting and Li, Quanxi and Xia, Yanwen and Qiao, Yifan and Deng, Xiangyun and Lu, Youyou and Xie, Tao and Cui, Huimin and Du, Zidong and others},
+  booktitle={Proceedings of the ACM SIGOPS 31st Symposium on Operating Systems Principles},
+  pages={286--304},
+  year={2025}
+}
 ```
 
-> Details for evaluation in:
+For README to Artifact Evaluation of our SOSP25 paper, please refer to AE.md for full instructions.
 
-- [docs/table2_fastcheck.md](docs/table2_fastcheck.md)
+For detailed instructions on how to inject faults into given application code, please refer to instructions.md.
 
-```shell
-# Run in User mode, not in ROOT
-./fw/scripts/table2_fastcheck.sh
-```
+For detailed introduction to the methodology of this platform, please refer to Artifact A of our SOSP paper.
 
-- [docs/table2_full.md](docs/table2_full.md)
+How to make contribution to this project? Please refer to contributions.md.
 
-```shell
-# Run in User mode, not in ROOT
-./fw/scripts/table2_full.sh
-```
-
-This repository presents Orthrus, a research artifact designed for efficient and timely detection of silent user data corruption in cloud environments. As mentioned in the paper, we validated Orthrus through two sets of performance experiments: one focusing on its overall performance and validation latency, and another on its error coverage.
